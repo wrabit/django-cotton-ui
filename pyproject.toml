@@ -9,7 +9,7 @@ description = "UI component library for Django Cotton"
 authors = ["Will Abbott <willabb83@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "cotton_ui"}]
+packages = [{include = "django_cotton_ui"}]
 homepage = "https://github.com/wrabit/django-cotton-ui"
 repository = "https://github.com/wrabit/django-cotton-ui"
 keywords = ["django", "components", "ui", "tailwind", "alpine"]

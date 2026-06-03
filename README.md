@@ -17,7 +17,7 @@ pip install django-cotton-ui
 INSTALLED_APPS = [
     # ...
     "django_cotton",
-    "cotton_ui",
+    "django_cotton_ui",
 ]
 ```
 
@@ -29,7 +29,7 @@ Cotton UI components are styled with Tailwind utility classes, so your Tailwind 
 @import "tailwindcss";
 
 /* Scan Cotton UI's templates so their utility classes are generated. */
-@source "<path-to-installed>/cotton_ui/templates/**/*.html";
+@source "<path-to-installed>/django_cotton_ui/templates/**/*.html";
 
 /* Accent palette (Flux-style). Swap teal for any Tailwind hue. */
 @theme {
@@ -50,7 +50,7 @@ Cotton UI components are styled with Tailwind utility classes, so your Tailwind 
 Find the installed templates path with:
 
 ```bash
-python -c "import cotton_ui, os; print(os.path.join(cotton_ui.__path__[0], 'templates'))"
+python -c "import django_cotton_ui, os; print(os.path.join(django_cotton_ui.__path__[0], 'templates'))"
 ```
 
 > Components use a class-based dark variant. If you toggle `.dark` on `<html>`, add
