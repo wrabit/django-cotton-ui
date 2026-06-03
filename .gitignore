@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Node / frontend build tooling (src/)
+node_modules/
+src/node_modules/
+src/dist/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
