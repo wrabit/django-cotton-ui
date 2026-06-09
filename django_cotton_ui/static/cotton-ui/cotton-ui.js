@@ -209,570 +209,6 @@
     }
   });
 
-  // js/Calendar/Matcher.js
-  var Matcher = class {
-    constructor(rule) {
-      this.type = this.determineMatcherType(rule);
-      this.rule = rule;
-    }
-    passes(date) {
-      date = this.createDateWithoutTime(date);
-      if (this.type == "dates") {
-        return this.rule.dates.some((element) => date.getTime() == this.createDateWithoutTime(element).getTime());
-      } else if (this.type == "range") {
-        if (this.rule.before != null && date.getTime() < this.createDateWithoutTime(this.rule.before).getTime()) {
-          return true;
-        }
-        if (this.rule.after != null && date.getTime() > this.createDateWithoutTime(this.rule.after).getTime()) {
-          return true;
-        }
-        return false;
-      } else if (this.type == "dayOfWeek") {
-        if (typeof this.rule.dayOfWeek == "number") {
-          return date.getDay() == this.rule.dayOfWeek;
-        } else {
-          return this.rule.dayOfWeek.some((rule) => rule == date.getDay());
-        }
-      }
-      return false;
-    }
-    determineMatcherType(rule) {
-      if (rule.dates != void 0 && Array.isArray(rule.dates)) {
-        return "dates";
-      } else if (rule.before != void 0 || rule.after != void 0) {
-        return "range";
-      } else if (rule.dayOfWeek != void 0) {
-        return "dayOfWeek";
-      }
-    }
-    createDateWithoutTime(value) {
-      let date = new Date(value);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  };
-
-  // js/Calendar/ModeHandlers/MultipleModeHandler.js
-  var MultipleModeHandler = class {
-    constructor(required, min, max) {
-      this.min = min;
-      this.max = max;
-      this._value = [];
-      this.required = !!required;
-    }
-    get value() {
-      return this._value;
-    }
-    set value(value) {
-      if (!Array.isArray(value)) {
-        console.warn("Selected type supplied to calendar in multiple mode is not an array");
-        return;
-      }
-      value.forEach((item) => {
-        const processDate = (input) => {
-          if (input == null)
-            return null;
-          if (typeof input === "string")
-            return this.createDateWithoutTime(input);
-          if (input instanceof Date)
-            return input;
-          console.warn("Item is not a date or date string, skipping");
-          return null;
-        };
-        item = processDate(item);
-        if (this.isSelectedDay(item)) {
-          return;
-        }
-        this._value.push(item);
-      });
-    }
-    isDisabled(date) {
-      if (this.max && this.max <= this._value.length) {
-        return !this.isSelectedDay(date);
-      }
-    }
-    indexOfDateInValue(array, value) {
-      for (let index = 0; index < array.length; index++) {
-        const date = array[index];
-        if (date.getTime() === value.getTime()) {
-          return index;
-        }
-      }
-      return -1;
-    }
-    dayClicked(date) {
-      let index = this.indexOfDateInValue(this._value, date);
-      if (index >= 0) {
-        this._value.splice(index, 1);
-      } else {
-        this._value.push(date);
-      }
-      return true;
-    }
-    isSelectedDay(date) {
-      return this.indexOfDateInValue(this._value, date) >= 0;
-    }
-    createDateWithoutTime(value) {
-      let date = new Date(value);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  };
-
-  // js/Calendar/ModeHandlers/RangeModeHandler.js
-  var RangeModeHandler = class {
-    constructor(required, min, max) {
-      this.min = min;
-      this.max = max;
-      this.required = !!required;
-    }
-    dayClicked(date) {
-      if (this._value.from == null || this._value.to != null && this._value.to.getTime() == date.getTime()) {
-        this._value.from = date;
-        this._value.to = null;
-        return true;
-      }
-      if (this._value.from.getTime() == date.getTime()) {
-        this._value.from = this.required ? this._value.from : null;
-        this._value.to = null;
-        return true;
-      }
-      if (this._value.from.getTime() >= date.getTime()) {
-        this._value.from = date;
-        return true;
-      }
-      this._value.to = date;
-      return true;
-    }
-    isSelectedDay(date) {
-      if (this._value.from == null) {
-        return false;
-      }
-      if (this._value.to == null) {
-        return this._value.from.getTime() == date.getTime();
-      }
-      return date.getTime() == this._value.from.getTime() || date.getTime() == this._value.to.getTime();
-    }
-    get value() {
-      return this._value;
-    }
-    set value(value) {
-      if (this._value == null) {
-        this._value = { from: null, to: null };
-      }
-      if (value == null) {
-        return;
-      }
-      const processDate = (input) => {
-        if (input == null)
-          return null;
-        if (typeof input === "string")
-          return this.createDateWithoutTime(input);
-        if (input instanceof Date)
-          return input;
-        console.warn("Item is not a date or date string, skipping");
-        return null;
-      };
-      this._value.from = processDate(value.from);
-      this._value.to = processDate(value.to);
-    }
-    isDisabled(date) {
-      if (this._value.from) {
-        let daysBetween = Math.abs(this.getNumberOfDaysBetweenDates(this._value.from, date));
-        return (this.min && daysBetween < this.min || this.max && daysBetween > this.max) && daysBetween != 0;
-      }
-    }
-    isRangeMiddle(date) {
-      if (this._value.from && this._value.to && date.getTime() >= this._value.from.getTime() && date.getTime() <= this._value.to.getTime()) {
-        return true;
-      }
-      return false;
-    }
-    createDateWithoutTime(value) {
-      let date = new Date(value);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-    getNumberOfDaysBetweenDates(date1, date2) {
-      return Math.round((date1.getTime() - date2.getTime()) / (1e3 * 3600 * 24));
-    }
-  };
-
-  // js/Calendar/ModeHandlers/SingleModeHandler.js
-  var SingleModeHandler = class {
-    constructor(required) {
-      this.required = !!required;
-    }
-    get value() {
-      return this._value;
-    }
-    set value(value) {
-      const processDate = (input) => {
-        if (input == null)
-          return null;
-        if (typeof input === "string")
-          return this.createDateWithoutTime(input);
-        if (input instanceof Date)
-          return input;
-        console.warn("Item is not a date or date string, skipping");
-        return null;
-      };
-      this._value = processDate(value);
-    }
-    dayClicked(date) {
-      if (this._value != null && this._value.getTime() == date.getTime() && !this.required) {
-        this._value = null;
-      } else {
-        this._value = date;
-      }
-      return true;
-    }
-    isSelectedDay(date) {
-      return this._value?.getTime() === date.getTime();
-    }
-    isDisabled(date) {
-      return false;
-    }
-    createDateWithoutTime(value) {
-      let date = new Date(value);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  };
-
-  // js/calendar.js
-  var calendar_default = (selected, mode, disabled, min, max, required) => ({
-    focusedDay: "",
-    mode,
-    max,
-    min,
-    month: "",
-    year: "",
-    daysInMonth: [],
-    preBlankDaysInMonth: [],
-    postBlankDaysInMonth: [],
-    modeHandler: null,
-    disabled: [],
-    monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    root: {
-      ["@keydown.left.prevent"]() {
-        this.focusAdd(-1);
-      },
-      ["@keydown.right.prevent"]() {
-        this.focusAdd(1);
-      },
-      ["@keydown.up.prevent"]() {
-        this.focusAdd(-this.days.length);
-      },
-      ["@keydown.down.prevent"]() {
-        this.focusAdd(this.days.length);
-      },
-      ["x-transition"]() {
-        return true;
-      }
-    },
-    previousMonthTrigger: {
-      ["@click"]() {
-        this.previousMonth();
-      }
-    },
-    nextMonthTrigger: {
-      ["@click"]() {
-        this.nextMonth();
-      }
-    },
-    yearLabel: {
-      ["x-text"]() {
-        return this.year;
-      }
-    },
-    monthLabel: {
-      ["x-text"]() {
-        return this.monthNames[this.month];
-      }
-    },
-    init() {
-      if (this.mode == "single") {
-        this.modeHandler = new SingleModeHandler(required);
-      } else if (this.mode == "multiple") {
-        this.modeHandler = new MultipleModeHandler(required, min, max);
-      } else if (this.mode == "range") {
-        this.modeHandler = new RangeModeHandler(required, min, max);
-      } else {
-        console.error("Mode is invalid, defaulting to single mode");
-        this.modeHandler = new SingleModeHandler(required);
-      }
-      if (Array.isArray(disabled)) {
-        disabled.forEach((element) => {
-          this.disabled.push(new Matcher(element));
-        });
-      } else if (typeof disabled == "object" && disabled != null) {
-        this.disabled = [new Matcher(disabled)];
-      }
-      let now = new Date();
-      this.month = now.getMonth();
-      this.year = now.getFullYear();
-      this.focusedDay = now.getDay();
-      this.calculateDays();
-      if (!!selected) {
-        this.dispatchChange();
-      }
-    },
-    dispatchChange() {
-      this.$nextTick(() => {
-        this.$dispatch("change", { value: this.modeHandler.value });
-      });
-    },
-    dayClicked(date) {
-      let selectedDate = new Date(this.year, this.month, date);
-      if (this.isDisabled(selectedDate)) {
-        return;
-      }
-      this.focusedDay = date;
-      let dispatchEvent = this.modeHandler.dayClicked(selectedDate);
-      if (dispatchEvent) {
-        this.dispatchChange();
-      }
-    },
-    focusAdd(value) {
-      if (!Number.isInteger(this.focusedDay)) {
-        this.focusedDay = new Date(this.year, this.month, day).getDate();
-      }
-      this.focusedDay = this.focusedDay + value;
-      if (this.focusedDay > this.daysInMonth.length) {
-        this.focusedDay = this.focusedDay - this.daysInMonth.length;
-        this.nextMonth();
-      } else if (this.focusedDay <= 0) {
-        this.previousMonth();
-        this.focusedDay = this.daysInMonth.length + this.focusedDay;
-      }
-    },
-    previousMonth() {
-      if (this.month == 0) {
-        this.year--;
-        this.month = 12;
-      }
-      this.month--;
-      this.calculateDays();
-    },
-    nextMonth() {
-      if (this.month == 11) {
-        this.month = 0;
-        this.year++;
-      } else {
-        this.month++;
-      }
-      this.calculateDays();
-    },
-    isSelectedDay(day2) {
-      let date = new Date(this.year, this.month, day2);
-      return this.modeHandler.isSelectedDay(date);
-    },
-    isFocusedDate(day2) {
-      return this.focusedDay === day2 ? true : false;
-    },
-    isToday(day2) {
-      const today = new Date();
-      const d = new Date(this.year, this.month, day2);
-      return today.toDateString() === d.toDateString() ? true : false;
-    },
-    calculateDays() {
-      let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
-      let daysInPreviousMonth = new Date(this.year, this.month, 0).getDate();
-      let dayOfWeek = new Date(this.year, this.month).getDay();
-      let preBlankdaysArray = [];
-      for (var i = 1; i <= dayOfWeek; i++) {
-        preBlankdaysArray.push(daysInPreviousMonth - i + 1);
-      }
-      preBlankdaysArray = preBlankdaysArray.reverse();
-      let postBlankdaysArray = [];
-      for (var i = 1; i <= this.days.length * 6 - (preBlankdaysArray.length + daysInMonth); i++) {
-        postBlankdaysArray.push(i);
-      }
-      let daysArray = [];
-      for (var i = 1; i <= daysInMonth; i++) {
-        daysArray.push(i);
-      }
-      this.preBlankDaysInMonth = preBlankdaysArray;
-      this.postBlankDaysInMonth = postBlankdaysArray;
-      this.daysInMonth = daysArray;
-    },
-    isDisabled(date) {
-      return this.disabled.some((rule) => rule.passes(date)) || this.modeHandler.isDisabled(date);
-    },
-    isRangeMiddle(date) {
-      if (mode == "range") {
-        return this.modeHandler.isRangeMiddle(date);
-      }
-      return false;
-    }
-  });
-
-  // js/checkbox.js
-  var checkbox_default = (name, initialValues = []) => ({
-    values: Array.isArray(initialValues) ? initialValues : [],
-    name,
-    init() {
-      if (this.values.length === 0) {
-        const checkedInputs = this.$el.querySelectorAll('input[type="checkbox"]:checked');
-        this.values = Array.from(checkedInputs).map((input) => input.value);
-      }
-    },
-    toggle(optionValue) {
-      if (this.isChecked(optionValue)) {
-        this.values = this.values.filter((v) => v !== optionValue);
-      } else {
-        this.values.push(optionValue);
-      }
-      this.$dispatch("change", { values: this.values });
-    },
-    isChecked(optionValue) {
-      return this.values.includes(optionValue);
-    }
-  });
-
-  // js/command.js
-  var command_default = (value) => ({
-    keyword: value,
-    focusedItem: null,
-    root: {
-      ["@keydown"]($event) {
-        if ($event.key == "Home") {
-          this.selectOption(1, false);
-        }
-        if ($event.key == "End") {
-          this.selectOption(-1, false);
-        }
-      },
-      ["@keydown.capture.down.prevent"]() {
-        this.selectOption(1);
-      },
-      ["@keydown.capture.up.prevent"]() {
-        this.selectOption(-1);
-      },
-      ["@keydown.capture.enter.prevent"]() {
-        if (this.focusedItem != null) {
-          this.focusedItem.click();
-        }
-      }
-    },
-    init() {
-      this.$nextTick(() => {
-        this.selectOption(0, false);
-      });
-    },
-    commandInput: {
-      ["@input"]() {
-        this.keyword = this.$el.value;
-        this.$nextTick(() => {
-          this.selectOption(0, false);
-        });
-        this.$dispatch("valueChange", { value: this.keyword });
-      },
-      [":id"]() {
-        return this.$id("command") + "-input";
-      },
-      [":aria-controls"]() {
-        return this.$id("command") + "-list";
-      }
-    },
-    commandList: {
-      [":id"]() {
-        return this.$id("command") + "-list";
-      }
-    },
-    commandItem: {
-      [":data-cmd-item"]() {
-        return true;
-      },
-      [":data-selected"]() {
-        return this.$el.contains(this.focusedItem);
-      },
-      [":aria-selected"]() {
-        return this.$el.contains(this.focusedItem);
-      },
-      [":tabindex"]() {
-        return this.$el.contains(this.focusedItem) ? 0 : -1;
-      },
-      ["x-effect"]() {
-        if (this.keyword == "" || this.fuzzySearch(this.keyword, this.$el.innerText)) {
-          this.$el.dataset.active = true;
-          this.$el.style.display = "flex";
-        } else {
-          this.$el.dataset.active = false;
-          this.$el.style.display = "none";
-        }
-      },
-      ["@mouseenter"]() {
-        return this.focusedItem = this.$el;
-      }
-    },
-    commandGroupHeading: {
-      [":id"]() {
-        return this.$id("command") + "-group-heading";
-      }
-    },
-    commandGroup: {
-      [":id"]() {
-        return this.$id("command") + "-group";
-      },
-      [":aria-labelledby"]() {
-        return this.$id("command") + "-group-heading";
-      }
-    },
-    commandGroupContainer: {
-      ["x-effect"]() {
-        this.keyword == "";
-        this.$nextTick(() => {
-          this.$el.style.display = this.$el.querySelectorAll("[data-active=true]").length > 0 ? "block" : "none";
-        });
-      }
-    },
-    commandEmpty: {
-      ["x-effect"]() {
-        this.keyword == "";
-        this.$nextTick(() => {
-          this.$el.style.display = this.$refs.list.querySelectorAll("[data-active=true]").length > 0 ? "none" : "block";
-        });
-      }
-    },
-    selectOption(index, relative = true) {
-      let nodeList = this.$refs.list.querySelectorAll("[data-active=true]");
-      let nodeListArray = Array.from(nodeList);
-      let initialIndex = index;
-      if (nodeList.length == 0 || !nodeListArray.some((node) => JSON.parse(node.dataset.disabled) == false)) {
-        return;
-      }
-      if (relative) {
-        let previousIndex = Array.from(nodeList).findIndex((node) => node.isEqualNode(this.focusedItem)) ?? 0;
-        index += previousIndex;
-      }
-      index += index < 0 ? nodeList.length : 0;
-      index = index % nodeList.length;
-      while (JSON.parse(nodeList[index].dataset.disabled)) {
-        index += initialIndex < 0 ? -1 : 1;
-        index = index % nodeList.length;
-      }
-      this.focusedItem = nodeList[index];
-      this.focusedItem.scrollIntoView(initialIndex < 0);
-    },
-    fuzzySearch(keyword, text) {
-      const keywordLower = keyword.toLowerCase();
-      const textLower = text.toLowerCase();
-      let keywordIndex = 0;
-      for (let i = 0; i < textLower.length; i++) {
-        if (textLower[i] === keywordLower[keywordIndex]) {
-          keywordIndex++;
-        }
-        if (keywordIndex === keywordLower.length) {
-          return true;
-        }
-      }
-      return false;
-    }
-  });
-
   // node_modules/date-fns/toDate.mjs
   function toDate(argument) {
     const argStr = Object.prototype.toString.call(argument);
@@ -2222,12 +1658,931 @@
     return matched[1].replace(doubleQuoteRegExp, "'");
   }
 
+  // js/Calendar/Matcher.js
+  var Matcher = class {
+    constructor(rule) {
+      this.type = this.determineMatcherType(rule);
+      this.rule = rule;
+    }
+    passes(date) {
+      date = this.createDateWithoutTime(date);
+      if (this.type == "dates") {
+        return this.rule.dates.some((element) => date.getTime() == this.createDateWithoutTime(element).getTime());
+      } else if (this.type == "range") {
+        if (this.rule.before != null && date.getTime() < this.createDateWithoutTime(this.rule.before).getTime()) {
+          return true;
+        }
+        if (this.rule.after != null && date.getTime() > this.createDateWithoutTime(this.rule.after).getTime()) {
+          return true;
+        }
+        return false;
+      } else if (this.type == "dayOfWeek") {
+        if (typeof this.rule.dayOfWeek == "number") {
+          return date.getDay() == this.rule.dayOfWeek;
+        } else {
+          return this.rule.dayOfWeek.some((rule) => rule == date.getDay());
+        }
+      }
+      return false;
+    }
+    determineMatcherType(rule) {
+      if (rule.dates != void 0 && Array.isArray(rule.dates)) {
+        return "dates";
+      } else if (rule.before != void 0 || rule.after != void 0) {
+        return "range";
+      } else if (rule.dayOfWeek != void 0) {
+        return "dayOfWeek";
+      }
+    }
+    createDateWithoutTime(value) {
+      let date = new Date(value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+  };
+
+  // js/Calendar/ModeHandlers/MultipleModeHandler.js
+  var MultipleModeHandler = class {
+    constructor(required, min, max) {
+      this.min = min;
+      this.max = max;
+      this._value = [];
+      this.required = !!required;
+    }
+    get value() {
+      return this._value;
+    }
+    set value(value) {
+      if (!Array.isArray(value)) {
+        console.warn("Selected type supplied to calendar in multiple mode is not an array");
+        return;
+      }
+      value.forEach((item) => {
+        const processDate = (input) => {
+          if (input == null)
+            return null;
+          if (typeof input === "string")
+            return this.createDateWithoutTime(input);
+          if (input instanceof Date)
+            return input;
+          console.warn("Item is not a date or date string, skipping");
+          return null;
+        };
+        item = processDate(item);
+        if (this.isSelectedDay(item)) {
+          return;
+        }
+        this._value.push(item);
+      });
+    }
+    isDisabled(date) {
+      if (this.max && this.max <= this._value.length) {
+        return !this.isSelectedDay(date);
+      }
+    }
+    indexOfDateInValue(array, value) {
+      for (let index = 0; index < array.length; index++) {
+        const date = array[index];
+        if (date.getTime() === value.getTime()) {
+          return index;
+        }
+      }
+      return -1;
+    }
+    dayClicked(date) {
+      let index = this.indexOfDateInValue(this._value, date);
+      if (index >= 0) {
+        this._value.splice(index, 1);
+      } else {
+        this._value.push(date);
+      }
+      return true;
+    }
+    isSelectedDay(date) {
+      return this.indexOfDateInValue(this._value, date) >= 0;
+    }
+    createDateWithoutTime(value) {
+      let date = new Date(value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+  };
+
+  // js/Calendar/ModeHandlers/RangeModeHandler.js
+  var RangeModeHandler = class {
+    constructor(required, min, max) {
+      this.min = min;
+      this.max = max;
+      this.required = !!required;
+    }
+    dayClicked(date) {
+      if (this._value.from == null || this._value.to != null && this._value.to.getTime() == date.getTime()) {
+        this._value.from = date;
+        this._value.to = null;
+        return true;
+      }
+      if (this._value.from.getTime() == date.getTime()) {
+        this._value.from = this.required ? this._value.from : null;
+        this._value.to = null;
+        return true;
+      }
+      if (this._value.from.getTime() >= date.getTime()) {
+        this._value.from = date;
+        return true;
+      }
+      this._value.to = date;
+      return true;
+    }
+    isSelectedDay(date) {
+      if (this._value.from == null) {
+        return false;
+      }
+      if (this._value.to == null) {
+        return this._value.from.getTime() == date.getTime();
+      }
+      return date.getTime() == this._value.from.getTime() || date.getTime() == this._value.to.getTime();
+    }
+    get value() {
+      return this._value;
+    }
+    set value(value) {
+      if (this._value == null) {
+        this._value = { from: null, to: null };
+      }
+      if (value == null) {
+        return;
+      }
+      const processDate = (input) => {
+        if (input == null)
+          return null;
+        if (typeof input === "string")
+          return this.createDateWithoutTime(input);
+        if (input instanceof Date)
+          return input;
+        console.warn("Item is not a date or date string, skipping");
+        return null;
+      };
+      this._value.from = processDate(value.from);
+      this._value.to = processDate(value.to);
+    }
+    isDisabled(date) {
+      if (this._value.from) {
+        let daysBetween = Math.abs(this.getNumberOfDaysBetweenDates(this._value.from, date));
+        return (this.min && daysBetween < this.min || this.max && daysBetween > this.max) && daysBetween != 0;
+      }
+    }
+    isRangeMiddle(date) {
+      if (this._value.from && this._value.to && date.getTime() >= this._value.from.getTime() && date.getTime() <= this._value.to.getTime()) {
+        return true;
+      }
+      return false;
+    }
+    get hasOpenRange() {
+      return !!(this._value && this._value.from && this._value.to == null);
+    }
+    isInPreviewRange(date, hoverDate) {
+      if (!this.hasOpenRange || !hoverDate)
+        return false;
+      const from = this._value.from.getTime();
+      const hover = hoverDate.getTime();
+      const t = date.getTime();
+      return t >= Math.min(from, hover) && t <= Math.max(from, hover);
+    }
+    createDateWithoutTime(value) {
+      let date = new Date(value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    getNumberOfDaysBetweenDates(date1, date2) {
+      return Math.round((date1.getTime() - date2.getTime()) / (1e3 * 3600 * 24));
+    }
+  };
+
+  // js/Calendar/ModeHandlers/SingleModeHandler.js
+  var SingleModeHandler = class {
+    constructor(required) {
+      this.required = !!required;
+    }
+    get value() {
+      return this._value;
+    }
+    set value(value) {
+      const processDate = (input) => {
+        if (input == null)
+          return null;
+        if (typeof input === "string")
+          return this.createDateWithoutTime(input);
+        if (input instanceof Date)
+          return input;
+        console.warn("Item is not a date or date string, skipping");
+        return null;
+      };
+      this._value = processDate(value);
+    }
+    dayClicked(date) {
+      if (this._value != null && this._value.getTime() == date.getTime() && !this.required) {
+        this._value = null;
+      } else {
+        this._value = date;
+      }
+      return true;
+    }
+    isSelectedDay(date) {
+      return this._value?.getTime() === date.getTime();
+    }
+    isDisabled(date) {
+      return false;
+    }
+    createDateWithoutTime(value) {
+      let date = new Date(value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+  };
+
+  // js/calendar.js
+  var calendar_default = (selected, mode, disabled, min, max, required, min_date, max_date, disabled_days, disabled_dates, value_format) => ({
+    focusedDay: "",
+    mode,
+    value_format: value_format || "yyyy-MM-dd",
+    max,
+    min,
+    month: "",
+    year: "",
+    daysInMonth: [],
+    preBlankDaysInMonth: [],
+    postBlankDaysInMonth: [],
+    hoveredDate: null,
+    view: "days",
+    yearRangeStart: "",
+    modeHandler: null,
+    disabled: [],
+    monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    root: {
+      ["@keydown.left.prevent"]() {
+        this.focusAdd(-1);
+      },
+      ["@keydown.right.prevent"]() {
+        this.focusAdd(1);
+      },
+      ["@keydown.up.prevent"]() {
+        this.focusAdd(-this.days.length);
+      },
+      ["@keydown.down.prevent"]() {
+        this.focusAdd(this.days.length);
+      },
+      ["x-transition"]() {
+        return true;
+      }
+    },
+    previousMonthTrigger: {
+      ["@click"]() {
+        this.previousMonth();
+      }
+    },
+    nextMonthTrigger: {
+      ["@click"]() {
+        this.nextMonth();
+      }
+    },
+    yearLabel: {
+      ["x-text"]() {
+        return this.year;
+      }
+    },
+    monthLabel: {
+      ["x-text"]() {
+        return this.monthNames[this.month];
+      }
+    },
+    init() {
+      if (this.mode == "single") {
+        this.modeHandler = new SingleModeHandler(required);
+      } else if (this.mode == "multiple") {
+        this.modeHandler = new MultipleModeHandler(required, min, max);
+      } else if (this.mode == "range") {
+        this.modeHandler = new RangeModeHandler(required, min, max);
+      } else {
+        console.error("Mode is invalid, defaulting to single mode");
+        this.modeHandler = new SingleModeHandler(required);
+      }
+      if (Array.isArray(disabled)) {
+        disabled.forEach((element) => {
+          this.disabled.push(new Matcher(element));
+        });
+      } else if (typeof disabled == "object" && disabled != null) {
+        this.disabled = [new Matcher(disabled)];
+      }
+      if (min_date)
+        this.disabled.push(new Matcher({ before: min_date }));
+      if (max_date)
+        this.disabled.push(new Matcher({ after: max_date }));
+      if (disabled_days != null)
+        this.disabled.push(new Matcher({ dayOfWeek: disabled_days }));
+      if (Array.isArray(disabled_dates) && disabled_dates.length)
+        this.disabled.push(new Matcher({ dates: disabled_dates }));
+      let now = new Date();
+      this.month = now.getMonth();
+      this.year = now.getFullYear();
+      this.focusedDay = now.getDay();
+      this.calculateDays();
+      if (!!selected) {
+        this.dispatchChange();
+      }
+    },
+    dispatchChange() {
+      this.$nextTick(() => {
+        this.$dispatch("change", { value: this.modeHandler.value });
+      });
+    },
+    serialize(date) {
+      return date == null ? "" : format(new Date(date), this.value_format);
+    },
+    dayClicked(date) {
+      let selectedDate = new Date(this.year, this.month, date);
+      if (this.isDisabled(selectedDate)) {
+        return;
+      }
+      this.focusedDay = date;
+      let dispatchEvent = this.modeHandler.dayClicked(selectedDate);
+      if (dispatchEvent) {
+        this.dispatchChange();
+      }
+    },
+    focusAdd(value) {
+      if (!Number.isInteger(this.focusedDay)) {
+        this.focusedDay = new Date(this.year, this.month, day).getDate();
+      }
+      this.focusedDay = this.focusedDay + value;
+      if (this.focusedDay > this.daysInMonth.length) {
+        this.focusedDay = this.focusedDay - this.daysInMonth.length;
+        this.nextMonth();
+      } else if (this.focusedDay <= 0) {
+        this.previousMonth();
+        this.focusedDay = this.daysInMonth.length + this.focusedDay;
+      }
+    },
+    previousMonth() {
+      if (this.month == 0) {
+        this.year--;
+        this.month = 12;
+      }
+      this.month--;
+      this.calculateDays();
+    },
+    nextMonth() {
+      if (this.month == 11) {
+        this.month = 0;
+        this.year++;
+      } else {
+        this.month++;
+      }
+      this.calculateDays();
+    },
+    isSelectedDay(day2) {
+      let date = new Date(this.year, this.month, day2);
+      return this.modeHandler.isSelectedDay(date);
+    },
+    isFocusedDate(day2) {
+      return this.focusedDay === day2 ? true : false;
+    },
+    isToday(day2) {
+      const today = new Date();
+      const d = new Date(this.year, this.month, day2);
+      return today.toDateString() === d.toDateString() ? true : false;
+    },
+    calculateDays() {
+      let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
+      let daysInPreviousMonth = new Date(this.year, this.month, 0).getDate();
+      let dayOfWeek = new Date(this.year, this.month).getDay();
+      let preBlankdaysArray = [];
+      for (var i = 1; i <= dayOfWeek; i++) {
+        preBlankdaysArray.push(daysInPreviousMonth - i + 1);
+      }
+      preBlankdaysArray = preBlankdaysArray.reverse();
+      let postBlankdaysArray = [];
+      let usedCells = preBlankdaysArray.length + daysInMonth;
+      let totalCells = Math.ceil(usedCells / this.days.length) * this.days.length;
+      for (var i = 1; i <= totalCells - usedCells; i++) {
+        postBlankdaysArray.push(i);
+      }
+      let daysArray = [];
+      for (var i = 1; i <= daysInMonth; i++) {
+        daysArray.push(i);
+      }
+      this.preBlankDaysInMonth = preBlankdaysArray;
+      this.postBlankDaysInMonth = postBlankdaysArray;
+      this.daysInMonth = daysArray;
+    },
+    isDisabled(date) {
+      return this.disabled.some((rule) => rule.passes(date)) || this.modeHandler.isDisabled(date);
+    },
+    isRangeMiddle(date) {
+      if (mode == "range") {
+        return this.modeHandler.isRangeMiddle(date);
+      }
+      return false;
+    },
+    dayHovered(day2) {
+      if (mode == "range") {
+        this.hoveredDate = new Date(this.year, this.month, day2);
+      }
+    },
+    clearHover() {
+      this.hoveredDate = null;
+    },
+    isInPreviewRange(day2) {
+      if (mode != "range" || typeof this.modeHandler.isInPreviewRange !== "function") {
+        return false;
+      }
+      return this.modeHandler.isInPreviewRange(new Date(this.year, this.month, day2), this.hoveredDate);
+    },
+    showMonths() {
+      this.view = "months";
+    },
+    showYears() {
+      this.yearRangeStart = this.year - 6;
+      this.view = "years";
+    },
+    selectMonth(m) {
+      this.month = m;
+      this.view = "days";
+      this.calculateDays();
+    },
+    selectYear(y) {
+      this.year = y;
+      this.view = "months";
+    },
+    headerPrev() {
+      if (this.view === "months") {
+        this.year--;
+      } else if (this.view === "years") {
+        this.yearRangeStart -= 12;
+      } else {
+        this.previousMonth();
+      }
+    },
+    headerNext() {
+      if (this.view === "months") {
+        this.year++;
+      } else if (this.view === "years") {
+        this.yearRangeStart += 12;
+      } else {
+        this.nextMonth();
+      }
+    },
+    get yearRange() {
+      let start = this.yearRangeStart || this.year - 6;
+      return Array.from({ length: 12 }, (_, i) => start + i);
+    }
+  });
+
+  // js/checkbox.js
+  var checkbox_default = (name, initialValues = []) => ({
+    values: Array.isArray(initialValues) ? initialValues : [],
+    name,
+    init() {
+      if (this.values.length === 0) {
+        const checkedInputs = this.$el.querySelectorAll('input[type="checkbox"]:checked');
+        this.values = Array.from(checkedInputs).map((input) => input.value);
+      }
+    },
+    toggle(optionValue) {
+      if (this.isChecked(optionValue)) {
+        this.values = this.values.filter((v) => v !== optionValue);
+      } else {
+        this.values.push(optionValue);
+      }
+      this.$dispatch("change", { values: this.values });
+    },
+    isChecked(optionValue) {
+      return this.values.includes(optionValue);
+    }
+  });
+
+  // js/positioning.js
+  function positionPopover(trigger, content, opts = {}) {
+    if (!trigger || !content)
+      return;
+    const {
+      position = "bottom",
+      align = "start",
+      offset = 4,
+      responsive = true
+    } = opts;
+    const t = trigger.getBoundingClientRect();
+    const off = parseInt(offset, 10) || 0;
+    let finalPosition = position;
+    let finalAlign = align;
+    if (responsive) {
+      const c = content.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      if (position === "bottom") {
+        const below = vh - t.bottom - off;
+        const above = t.top - off;
+        if (c.height > below && above > below)
+          finalPosition = "top";
+      } else if (position === "top") {
+        const above = t.top - off;
+        const below = vh - t.bottom - off;
+        if (c.height > above && below > above)
+          finalPosition = "bottom";
+      } else if (position === "right") {
+        const right = vw - t.right - off;
+        const left = t.left - off;
+        if (c.width > right && left > right)
+          finalPosition = "left";
+      } else if (position === "left") {
+        const left = t.left - off;
+        const right = vw - t.right - off;
+        if (c.width > left && right > left)
+          finalPosition = "right";
+      }
+      if ((finalPosition === "bottom" || finalPosition === "top") && align !== "stretch") {
+        if (align === "start") {
+          const spaceRight = vw - t.left;
+          if (c.width > spaceRight && t.right > c.width)
+            finalAlign = "end";
+        } else if (align === "end") {
+          const spaceLeft = t.right;
+          if (c.width > spaceLeft && vw - t.left > c.width)
+            finalAlign = "start";
+        }
+      }
+    }
+    content.style.top = "";
+    content.style.bottom = "";
+    content.style.left = "";
+    content.style.right = "";
+    content.style.transform = "";
+    if (finalPosition === "bottom")
+      content.style.top = `calc(100% + ${off}px)`;
+    else if (finalPosition === "top")
+      content.style.bottom = `calc(100% + ${off}px)`;
+    else if (finalPosition === "left")
+      content.style.right = `calc(100% + ${off}px)`;
+    else if (finalPosition === "right")
+      content.style.left = `calc(100% + ${off}px)`;
+    if (finalPosition === "top" || finalPosition === "bottom") {
+      if (finalAlign === "stretch") {
+        content.style.left = "0";
+        content.style.right = "0";
+      } else if (finalAlign === "start")
+        content.style.left = "0";
+      else if (finalAlign === "end")
+        content.style.right = "0";
+      else if (finalAlign === "center") {
+        content.style.left = "50%";
+        content.style.transform = "translateX(-50%)";
+      }
+    } else {
+      if (finalAlign === "stretch") {
+        content.style.top = "0";
+        content.style.bottom = "0";
+      } else if (finalAlign === "start")
+        content.style.top = "0";
+      else if (finalAlign === "end")
+        content.style.bottom = "0";
+      else if (finalAlign === "center") {
+        content.style.top = "50%";
+        content.style.transform = "translateY(-50%)";
+      }
+    }
+    return { position: finalPosition, align: finalAlign };
+  }
+  function watchReposition(callback) {
+    let ticking = false;
+    const handler = () => {
+      if (ticking)
+        return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        callback();
+        ticking = false;
+      });
+    };
+    window.addEventListener("resize", handler);
+    window.addEventListener("scroll", handler, true);
+    return () => {
+      window.removeEventListener("resize", handler);
+      window.removeEventListener("scroll", handler, true);
+    };
+  }
+
+  // js/combobox.js
+  var combobox_default = (config) => ({
+    isOpen: false,
+    highlightedIndex: 0,
+    searchTerm: "",
+    tags: [],
+    options: [],
+    name: config.name,
+    maxTags: config.maxTags,
+    writable: config.writable,
+    searchable: config.searchable,
+    closeAfterSelecting: config.closeAfterSelecting,
+    autoclose: config.autoclose,
+    disabled: config.disabled,
+    placeholder: config.placeholder,
+    init() {
+      this._cleanupReposition = watchReposition(() => {
+        if (this.isOpen)
+          this.positionDropdown();
+      });
+    },
+    destroy() {
+      this._cleanupReposition && this._cleanupReposition();
+    },
+    positionDropdown() {
+      positionPopover(this.$refs.trigger, this.$refs.content, {
+        position: "bottom",
+        align: "stretch",
+        offset: 4,
+        responsive: true
+      });
+    },
+    initSelected(selected_encoded) {
+      let selected = JSON.parse(decodeURIComponent(selected_encoded));
+      this.tags = Array.isArray(selected) ? selected : selected ? [selected] : [];
+      this.updateHiddenSelect();
+    },
+    initOptions(options_encoded) {
+      let options = JSON.parse(decodeURIComponent(options_encoded));
+      this.options = Array.isArray(options) ? options : [];
+    },
+    get filteredOptions() {
+      if (!this.searchTerm)
+        return this.options;
+      return this.options.filter(
+        (option) => option.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    },
+    get showCreateOption() {
+      return this.writable && this.searchTerm && !this.filteredOptions.includes(this.searchTerm) && !this.tags.includes(this.searchTerm);
+    },
+    get hasTagsRemaining() {
+      return this.maxTags > 0 ? this.maxTags > this.tags.length : true;
+    },
+    get getPlaceholder() {
+      if (this.isOpen && !this.hasTagsRemaining)
+        return "Maximum reached";
+      if (this.tags.length === 0) {
+        if (this.placeholder)
+          return this.placeholder;
+        return this.writable ? "Search or type new..." : "Select options...";
+      }
+      return "";
+    },
+    openDropdown() {
+      if (this.disabled)
+        return;
+      this.isOpen = true;
+      this.$nextTick(() => {
+        this.positionDropdown();
+        if (this.searchable || this.writable) {
+          this.$refs.searchInput.focus();
+        }
+        this.highlightedIndex = 0;
+      });
+    },
+    closeDropdown() {
+      this.isOpen = false;
+      this.searchTerm = "";
+      this.$el.querySelector('[tabindex="0"]').focus();
+    },
+    selectOption(option) {
+      if (this.tags.includes(option)) {
+        this.removeTag(option);
+      } else {
+        if (this.maxTags === 1 && this.tags.length > 0) {
+          this.removeTag(this.tags[0]);
+        }
+        this.addTag(option);
+      }
+    },
+    addTag(tag) {
+      if (this.disabled)
+        return;
+      if (this.maxTags !== -1 && this.tags.length >= this.maxTags)
+        return;
+      if (!this.tags.includes(tag)) {
+        this.tags.push(tag);
+        this.updateHiddenSelect();
+        const shouldAutoclose = this.autoclose && this.maxTags !== -1 && this.tags.length >= this.maxTags;
+        if (this.closeAfterSelecting || shouldAutoclose) {
+          this.closeDropdown();
+        } else {
+          this.searchTerm = "";
+          if (this.searchable || this.writable) {
+            this.$refs.searchInput.focus();
+          }
+        }
+      }
+    },
+    removeTag(tag) {
+      if (this.disabled)
+        return;
+      this.tags = this.tags.filter((t) => t !== tag);
+      this.updateHiddenSelect();
+    },
+    removeLastTag() {
+      if (this.tags.length > 0 && !this.searchTerm) {
+        this.removeTag(this.tags[this.tags.length - 1]);
+      }
+    },
+    handleEnter() {
+      if (this.showCreateOption && this.highlightedIndex === this.filteredOptions.length) {
+        this.addTag(this.searchTerm);
+      } else if (this.filteredOptions.length > 0 && this.highlightedIndex < this.filteredOptions.length) {
+        this.selectOption(this.filteredOptions[this.highlightedIndex]);
+      } else if (this.writable && this.searchTerm) {
+        this.addTag(this.searchTerm);
+      }
+    },
+    highlightNext() {
+      const maxIndex = this.showCreateOption ? this.filteredOptions.length : this.filteredOptions.length - 1;
+      if (this.highlightedIndex < maxIndex) {
+        this.highlightedIndex++;
+        this.scrollToHighlighted();
+      }
+    },
+    highlightPrev() {
+      if (this.highlightedIndex > 0) {
+        this.highlightedIndex--;
+        this.scrollToHighlighted();
+      }
+    },
+    scrollToHighlighted() {
+      this.$nextTick(() => {
+        const list = this.$refs.optionsList;
+        if (!list)
+          return;
+        const items = list.querySelectorAll("[data-combobox-option]");
+        const el = items[this.highlightedIndex];
+        if (el)
+          el.scrollIntoView({ block: "nearest" });
+      });
+    },
+    updateHiddenSelect() {
+      this.$nextTick(() => {
+        this.$dispatch("change", this.tags);
+      });
+    }
+  });
+
+  // js/command.js
+  var command_default = (value) => ({
+    keyword: value,
+    focusedItem: null,
+    root: {
+      ["@keydown"]($event) {
+        if ($event.key == "Home") {
+          this.selectOption(1, false);
+        }
+        if ($event.key == "End") {
+          this.selectOption(-1, false);
+        }
+      },
+      ["@keydown.capture.down.prevent"]() {
+        this.selectOption(1);
+      },
+      ["@keydown.capture.up.prevent"]() {
+        this.selectOption(-1);
+      },
+      ["@keydown.capture.enter.prevent"]() {
+        if (this.focusedItem != null) {
+          this.focusedItem.click();
+        }
+      }
+    },
+    init() {
+      this.$nextTick(() => {
+        this.selectOption(0, false);
+      });
+    },
+    commandInput: {
+      ["@input"]() {
+        this.keyword = this.$el.value;
+        this.$nextTick(() => {
+          this.selectOption(0, false);
+        });
+        this.$dispatch("valueChange", { value: this.keyword });
+      },
+      [":id"]() {
+        return this.$id("command") + "-input";
+      },
+      [":aria-controls"]() {
+        return this.$id("command") + "-list";
+      }
+    },
+    commandList: {
+      [":id"]() {
+        return this.$id("command") + "-list";
+      }
+    },
+    commandItem: {
+      [":data-cmd-item"]() {
+        return true;
+      },
+      [":data-selected"]() {
+        return this.$el.contains(this.focusedItem);
+      },
+      [":aria-selected"]() {
+        return this.$el.contains(this.focusedItem);
+      },
+      [":tabindex"]() {
+        return this.$el.contains(this.focusedItem) ? 0 : -1;
+      },
+      ["x-effect"]() {
+        if (this.keyword == "" || this.fuzzySearch(this.keyword, this.$el.innerText)) {
+          this.$el.dataset.active = true;
+          this.$el.style.display = "flex";
+        } else {
+          this.$el.dataset.active = false;
+          this.$el.style.display = "none";
+        }
+      },
+      ["@mouseenter"]() {
+        return this.focusedItem = this.$el;
+      }
+    },
+    commandGroupHeading: {
+      [":id"]() {
+        return this.$id("command") + "-group-heading";
+      }
+    },
+    commandGroup: {
+      [":id"]() {
+        return this.$id("command") + "-group";
+      },
+      [":aria-labelledby"]() {
+        return this.$id("command") + "-group-heading";
+      }
+    },
+    commandGroupContainer: {
+      ["x-effect"]() {
+        this.keyword;
+        this.$nextTick(() => {
+          this.$el.style.display = this.$el.querySelectorAll("[data-active=true]").length > 0 ? "block" : "none";
+        });
+      }
+    },
+    commandEmpty: {
+      ["x-effect"]() {
+        this.keyword;
+        this.$nextTick(() => {
+          this.$el.style.display = this.$refs.list.querySelectorAll("[data-active=true]").length > 0 ? "none" : "block";
+        });
+      }
+    },
+    selectOption(index, relative = true) {
+      let nodeList = this.$refs.list.querySelectorAll("[data-active=true]");
+      let nodeListArray = Array.from(nodeList);
+      let initialIndex = index;
+      if (nodeList.length == 0 || !nodeListArray.some((node) => JSON.parse(node.dataset.disabled) == false)) {
+        return;
+      }
+      if (relative) {
+        let previousIndex = Array.from(nodeList).findIndex((node) => node.isEqualNode(this.focusedItem)) ?? 0;
+        index += previousIndex;
+      }
+      index += index < 0 ? nodeList.length : 0;
+      index = index % nodeList.length;
+      while (JSON.parse(nodeList[index].dataset.disabled)) {
+        index += initialIndex < 0 ? -1 : 1;
+        index = index % nodeList.length;
+      }
+      this.focusedItem = nodeList[index];
+      this.focusedItem.scrollIntoView(initialIndex < 0);
+    },
+    fuzzySearch(keyword, text) {
+      const keywordLower = keyword.toLowerCase();
+      const textLower = text.toLowerCase();
+      let keywordIndex = 0;
+      for (let i = 0; i < textLower.length; i++) {
+        if (textLower[i] === keywordLower[keywordIndex]) {
+          keywordIndex++;
+        }
+        if (keywordIndex === keywordLower.length) {
+          return true;
+        }
+      }
+      return false;
+    }
+  });
+
   // js/datePicker.js
-  var datePicker_default = (open, value, mode, format2) => ({
+  var datePicker_default = (open, value, mode, format2, value_format, locale, close_on_complete, trap = true) => ({
     open,
     value: null,
     mode,
     format: format2,
+    value_format: value_format || "yyyy-MM-dd",
+    locale: locale || "",
+    close_on_complete,
+    trap,
     root: {
       ["@keydown.esc"]() {
         return this.closePicker();
@@ -2263,18 +2618,31 @@
       ["@click.away"]() {
         return this.closePicker();
       },
-      ["x-anchor.bottom-start.offset.3"]() {
-        return this.$refs.datePickerInput;
-      },
-      ["x-trap"]() {
-        return this.open;
+      ["x-trap.noscroll"]() {
+        return this.open && this.trap;
       }
     },
     init() {
       this.value = value;
+      this._cleanupReposition = watchReposition(() => {
+        if (this.open)
+          this.position();
+      });
+    },
+    destroy() {
+      this._cleanupReposition && this._cleanupReposition();
+    },
+    position() {
+      positionPopover(this.$refs.datePickerInput, this.$refs.content, {
+        position: "bottom",
+        align: "start",
+        offset: 8,
+        responsive: true
+      });
     },
     openPicker() {
       this.open = true;
+      this.$nextTick(() => this.position());
     },
     closePicker() {
       this.open = false;
@@ -2282,11 +2650,35 @@
     togglePicker() {
       this.open ? this.closePicker() : this.openPicker();
     },
+    onCalendarChange(detail) {
+      if (!this.close_on_complete || !this.open)
+        return;
+      const v = detail && detail.value;
+      if (this.mode === "range") {
+        if (v && v.from && v.to)
+          this.closePicker();
+      } else if (this.mode === "multiple") {
+      } else if (v) {
+        this.closePicker();
+      }
+    },
     formatDate(date) {
       if (date == null) {
         return null;
       }
-      return format(new Date(date), this.format);
+      const d = new Date(date);
+      const styleKeywords = ["auto", "short", "medium", "long", "full"];
+      if (styleKeywords.includes(this.format)) {
+        const dateStyle = this.format === "auto" ? "short" : this.format;
+        return new Intl.DateTimeFormat(this.locale || void 0, { dateStyle }).format(d);
+      }
+      return format(d, this.format);
+    },
+    formatValue(date) {
+      if (date == null) {
+        return "";
+      }
+      return format(new Date(date), this.value_format);
     }
   });
 
@@ -2377,6 +2769,7 @@
     align: "start",
     offset: 4,
     responsive: false,
+    collapsible: false,
     init() {
       let ticking = false;
       this._reposition = () => {
@@ -2400,6 +2793,11 @@
     positionDropdown() {
       if (!this.$refs.content || !this.$refs.trigger)
         return;
+      if (this.collapsible && window.innerWidth < 768) {
+        const c = this.$refs.content;
+        c.style.top = c.style.bottom = c.style.left = c.style.right = c.style.transform = "";
+        return;
+      }
       const trigger = this.$refs.trigger.getBoundingClientRect();
       const content = this.$refs.content;
       const offset = parseInt(this.offset);
@@ -2987,6 +3385,12 @@
   var switchInput_default = (disabled = false, checked = false) => ({
     switchOn: checked,
     disabled,
+    ready: false,
+    init() {
+      this.$nextTick(() => {
+        this.ready = true;
+      });
+    },
     trigger: {
       ["@click"]() {
         this.toggle();
@@ -3029,6 +3433,9 @@
   });
 
   // js/cotton-ui.js
+  window.CottonUI = window.CottonUI || {};
+  window.CottonUI.positionPopover = positionPopover;
+  window.CottonUI.watchReposition = watchReposition;
   document.addEventListener("alpine:init", () => {
     Alpine.data("accordion", accordion_default);
     Alpine.data("accordionItem", accordionItem_default);
@@ -3037,6 +3444,7 @@
     Alpine.data("banner", banner_default);
     Alpine.data("calendar", calendar_default);
     Alpine.data("checkbox", checkbox_default);
+    Alpine.data("combobox", combobox_default);
     Alpine.data("command", command_default);
     Alpine.data("datePicker", datePicker_default);
     Alpine.data("dialog", dialog_default);

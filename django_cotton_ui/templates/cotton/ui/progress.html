@@ -1,0 +1,44 @@
+<c-vars
+    :value="0"
+    color="accent"
+    bar_class=""
+    size="md"
+    :show_value="False"
+    :size_classes="{
+        'xs': 'h-1',
+        'sm': 'h-1.5',
+        'md': 'h-2',
+        'lg': 'h-3',
+        'xl': 'h-4'
+    }"
+    :color_classes="{
+        'accent': 'bg-accent',
+        'zinc': 'bg-zinc-500 dark:bg-zinc-400',
+        'blue': 'bg-blue-500',
+        'sky': 'bg-sky-500',
+        'green': 'bg-green-500',
+        'amber': 'bg-amber-500',
+        'red': 'bg-red-500',
+        'violet': 'bg-violet-500',
+    }"
+    class=""
+/>
+
+<div class="flex items-center gap-3 {{ class }}">
+    <div
+        role="progressbar"
+        aria-valuenow="{{ value }}"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        {{ attrs }}
+        class="flex-1 {{ size_classes|get_item:size }} bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden"
+    >
+        <div
+            class="h-full rounded-full transition-[width] duration-500 ease-out {% if bar_class %}{{ bar_class }}{% else %}{{ color_classes|get_item:color }}{% endif %}"
+            style="width: {{ value }}%"
+        ></div>
+    </div>
+    {% if show_value %}
+        <span class="shrink-0 w-10 text-right text-sm font-medium text-zinc-600 dark:text-zinc-400 tabular-nums">{{ value }}%</span>
+    {% endif %}
+</div>

@@ -1,18 +1,56 @@
 <c-vars
-    size="default"
-    :size_classes="{
+    padding="md"
+    variant="raised"
+    title=""
+    subheading=""
+    :variant_classes="{
+        'raised': 'bg-[var(--color-surface)] shadow-[var(--shadow-box)] border border-[color:var(--color-card-border,var(--color-box-border))]',
+        'outline': 'border border-zinc-200 dark:border-zinc-700'
+    }"
+    :padding_classes="{
+        'none': '',
+        'xs': 'p-2',
         'sm': 'p-4',
-        'default': 'p-6'
+        'md': 'p-6',
+        'lg': 'p-8',
+        'xl': 'p-10',
+        '2xl': 'p-12'
     }"
     class
 />
 
+{% comment %}
+A surface container.
+  - variant="raised" (default): filled surface + shadow, lifts off the page.
+  - variant="outline": border only, no fill or shadow, sits flat on the page background.
+`padding` controls body padding; use `padding="none"` for a flush body so nested full-width
+content (an accordion, table or list) can sit edge to edge. Pass `title`/`subheading`
+(or a `header` slot) to render a padded header band with a divider above the body.
+Without a header the body keeps the old single-element layout, so `class` still applies
+to the padded box.
+{% endcomment %}
+{% if title or subheading or header %}
 <div {{ attrs }} class="
-    bg-white dark:bg-zinc-900
-    border border-zinc-200 dark:border-zinc-700
-    rounded-lg shadow-sm
-    {{ size_classes|get_item:size }}
+    rounded-box
+    {{ variant_classes|get_item:variant }}
+    {{ class }}
+">
+    <div class="px-6 py-4 border-b border-[color:var(--color-box-border)]">
+        {% if title %}<h3 class="font-semibold text-zinc-900 dark:text-zinc-100">{{ title }}</h3>{% endif %}
+        {% if subheading %}<p class="text-sm text-zinc-500 dark:text-zinc-400{% if title %} mt-0.5{% endif %}">{{ subheading }}</p>{% endif %}
+        {{ header }}
+    </div>
+    <div class="{{ padding_classes|get_item:padding }}">
+        {{ slot }}
+    </div>
+</div>
+{% else %}
+<div {{ attrs }} class="
+    rounded-box
+    {{ variant_classes|get_item:variant }}
+    {{ padding_classes|get_item:padding }}
     {{ class }}
 ">
     {{ slot }}
 </div>
+{% endif %}

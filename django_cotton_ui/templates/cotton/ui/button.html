@@ -1,48 +1,66 @@
 <c-vars
     variant="default"
-    size=""
+    size="md"
+    href=""
     :variants="{
         'default': 'bg-white text-zinc-800 border border-zinc-200 dark:bg-zinc-400/30 dark:text-zinc-300 dark:border-zinc-300/20 shadow',
         'primary': 'bg-accent text-accent-foreground hover:bg-accent-content border border-transparent',
         'subtle': 'bg-zinc-100 text-zinc-600 dark:bg-zinc-300/10 dark:text-zinc-300 border border-transparent',
         'danger': 'bg-red-500 text-white hover:bg-red-600 border border-transparent',
         'ghost': 'bg-transparent text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-transparent',
+        'text': 'bg-transparent text-accent hover:text-accent-content hover:underline border border-transparent',
     }"
     :outlined_variants="{
-        'default': 'border border-zinc-200 text-zinc-800 dark:border-zinc-700 dark:text-zinc-300',
+        'default': 'border border-zinc-200 text-zinc-800 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800',
         'primary': 'border border-accent text-accent hover:bg-accent/10',
-        'subtle': 'border border-zinc-200 text-zinc-800 dark:border-zinc-700 dark:text-zinc-300',
+        'subtle': 'border border-zinc-200 text-zinc-800 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800',
         'danger': 'border border-red-500 text-red-500 hover:bg-red-500/10',
-        'ghost': 'border border-zinc-400 text-zinc-600 dark:border-zinc-600 dark:text-zinc-400',
+        'ghost': 'border border-zinc-400 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-800',
+        'text': 'text-accent hover:text-accent-content hover:underline',
     }"
     :size_classes="{
         'xs': 'text-xs py-1 px-2',
         'sm': 'text-sm py-1.5 px-3',
-        '': 'text-sm py-2 px-4',
+        'md': 'text-sm py-2 px-4',
         'lg': 'text-base py-2.5 px-4',
-        'xl': 'text-lg py-3 px-5'
+        'xl': 'text-lg py-3 px-5',
+        '2xl': 'text-xl py-3.5 px-6'
     }"
     :outlined="False"
     class
 />
 
-<button {{ attrs }} type="button" class="
-    {% if outlined %}
-        {{ outlined_variants|get_item:variant }}
-    {% else %}
-        {{ variants|get_item:variant }}
-    {% endif %}
-    cursor-pointer whitespace-nowrap rounded-md theme(radius.button)
+{% comment %}
+Renders a <button> by default, or an <a> styled as a button when `href` is set
+(for link actions like CTAs, avoiding an invalid button-inside-anchor).
+{% endcomment %}
+{% if href %}
+<a
+    {{ attrs }}
+    href="{{ href }}"
+    class="
+    {% if outlined %}{{ outlined_variants|get_item:variant }}{% else %}{{ variants|get_item:variant }}{% endif %}
+    inline-block no-underline cursor-pointer whitespace-nowrap rounded-control
     {{ size_classes|get_item:size }}
+    {% if variant == 'text' %}!px-0{% endif %}
     font-medium transition text-center
-    focus-visible:outline
-    focus-visible:outline-2
-    focus-visible:outline-offset-2
-    focus-visible:outline-accent
+    focus-ring
     active:opacity-100
-    active:outline-offset-0
+    {{ class }}">
+    {{ slot }}
+</a>
+{% else %}
+<button {{ attrs }} type="button" class="
+    {% if outlined %}{{ outlined_variants|get_item:variant }}{% else %}{{ variants|get_item:variant }}{% endif %}
+    cursor-pointer whitespace-nowrap rounded-control
+    {{ size_classes|get_item:size }}
+    {% if variant == 'text' %}!px-0{% endif %}
+    font-medium transition text-center
+    focus-ring
+    active:opacity-100
     disabled:opacity-75
     disabled:cursor-not-allowed
     {{ class }}">
     {{ slot }}
 </button>
+{% endif %}

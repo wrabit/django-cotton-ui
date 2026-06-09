@@ -19,27 +19,31 @@
     @click.prevent="{% if not disabled %}toggle('{{ value }}'){% endif %}"
     @keydown.enter.stop.prevent="{% if not disabled %}toggle('{{ value }}'){% endif %}"
     @keydown.space.stop.prevent="{% if not disabled %}toggle('{{ value }}'){% endif %}"
-    class="flex items-start gap-3 cursor-pointer {% if disabled %}opacity-50 cursor-not-allowed{% endif %}"
+    class="flex items-start gap-3 cursor-pointer focus-ring {% if disabled %}opacity-50 cursor-not-allowed{% endif %}"
     x-bind:class="(() => {
         const variant = $el.closest('[data-variant]')?.dataset.variant || 'default';
         const classes = [];
 
         if (variant === 'default') {
             // Base layout classes are static, no dynamic classes needed for default
-        } else if (variant === 'buttons') {
-            classes.push('px-4', 'py-2', 'font-medium', 'transition-colors', 'border-r', 'border-zinc-200', 'dark:border-zinc-700', 'last:border-r-0', 'first:rounded-l-lg', 'last:rounded-r-lg');
+        } else if (variant === 'segmented') {
+            classes.push('px-4', 'py-2', 'font-medium', 'transition-[background-color,color]', 'border-r', 'border-zinc-200', 'dark:border-zinc-700', 'last:border-r-0', 'first:rounded-l-[var(--radius-control)]', 'last:rounded-r-[var(--radius-control)]');
             if ($data.isChecked('{{ value }}')) {
-                classes.push('bg-zinc-100', 'dark:bg-zinc-800');
+                {% if accent %}
+                classes.push('bg-accent', 'text-accent-foreground');
+                {% else %}
+                classes.push('bg-zinc-100', 'dark:bg-zinc-700');
+                {% endif %}
             } else {
-                classes.push('hover:bg-zinc-50', 'dark:hover:bg-zinc-700');
+                classes.push('hover:bg-zinc-50', 'dark:hover:bg-zinc-700/50');
             }
         } else if (variant === 'cards') {
-            classes.push('flex', 'flex-1', 'gap-4', 'rounded-lg', 'border-2', 'p-4', 'transition-all');
+            classes.push('flex', 'flex-1', 'gap-4', 'rounded-box', 'border-2', 'p-4', 'transition-[background-color]');
             if ($data.isChecked('{{ value }}')) {
                 {% if accent %}
                 classes.push('border-accent', 'bg-accent/5');
                 {% else %}
-                classes.push('border-zinc-900', 'dark:border-zinc-100', 'bg-zinc-50', 'dark:bg-zinc-800');
+                classes.push('border-[var(--color-muted,currentColor)]', 'bg-[color-mix(in_oklab,var(--color-muted,currentColor)_5%,transparent)]');
                 {% endif %}
             } else {
                 classes.push('border-zinc-200', 'dark:border-zinc-700');
@@ -56,6 +60,7 @@
         value="{{ value }}"
         :checked="isChecked('{{ value }}')"
         {% if disabled %}disabled{% endif %}
+        tabindex="-1"
         class="sr-only"
     />
 
@@ -63,14 +68,14 @@
     {% if slot %}
         {{ slot }}
     {% else %}
-        {% comment %}Checkbox indicator (default and cards variants only, hidden for buttons){% endcomment %}
-        <div x-show="{% if show_indicator %}(() => { const v = $el.closest('[data-variant]')?.dataset.variant || 'default'; return v !== 'buttons'; })(){% else %}false{% endif %}" class="flex items-center mt-0.5 h-5">
+        {% comment %}Checkbox indicator (default and cards variants only, hidden for segmented){% endcomment %}
+        <div x-show="{% if show_indicator %}(() => { const v = $el.closest('[data-variant]')?.dataset.variant || 'default'; return v !== 'segmented'; })(){% else %}false{% endif %}" class="flex items-center mt-0.5 h-5">
             <div class="flex items-center justify-center w-4 h-4 border-2 border-zinc-300 dark:border-zinc-600 rounded transition-all"
                  :class="{
                      {% if accent %}
                      'border-accent bg-accent': isChecked('{{ value }}'),
                      {% else %}
-                     'border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100': isChecked('{{ value }}'),
+                     'border-[var(--color-muted,currentColor)] bg-[var(--color-muted,currentColor)]': isChecked('{{ value }}'),
                      {% endif %}
                      'border-zinc-300 dark:border-zinc-600': !isChecked('{{ value }}')
                  }">
@@ -96,10 +101,7 @@
         {% comment %}Icon for buttons variant{% endcomment %}
         {% if icon %}
             <span class="flex items-center gap-2">
-                {% comment %}Icon placeholder - replace with actual icon component{% endcomment %}
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <span class="inline-flex items-center shrink-0 [&>svg]:w-4 [&>svg]:h-4">{{ icon }}</span>
                 {% if label %}{{ label }}{% endif %}
             </span>
         {% elif label %}

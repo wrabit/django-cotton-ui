@@ -1,0 +1,121 @@
+<c-vars
+    position="top-right"
+    appearance="soft"
+    :duration="4000"
+    class=""
+    :position_classes="{
+        'top-right': 'top-4 right-4 items-end',
+        'top-left': 'top-4 left-4 items-start',
+        'top-center': 'top-4 left-1/2 -translate-x-1/2 items-center',
+        'bottom-right': 'bottom-4 right-4 items-end flex-col-reverse',
+        'bottom-left': 'bottom-4 left-4 items-start flex-col-reverse',
+        'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2 items-center flex-col-reverse',
+    }"
+/>
+
+{% comment %}
+Drop this once (typically in your base layout). It listens on the window for a
+"toast" CustomEvent and renders a stack in each corner. Each toast can carry its
+own position, appearance, variant and class; anything it omits falls back to this
+container's props. The store is registered once and guarded so multiple includes
+never double-register.
+{% endcomment %}
+<script>
+document.addEventListener('alpine:init', () => {
+    if (window.Alpine && !Alpine.store('toasts')) {
+        Alpine.store('toasts', {
+            items: [],
+            add(detail) {
+                const id = Date.now() + Math.random();
+                const toast = {
+                    id,
+                    show: false,
+                    variant: detail.variant || 'info',
+                    appearance: detail.appearance || 'soft',
+                    position: detail.position || 'top-right',
+                    title: detail.title || '',
+                    message: detail.message || '',
+                    class: detail.class || '',
+                    duration: detail.duration ?? 4000,
+                };
+                this.items.push(toast);
+                requestAnimationFrame(() => { const t = this.items.find(i => i.id === id); if (t) t.show = true; });
+                if (toast.duration > 0) setTimeout(() => this.dismiss(id), toast.duration);
+            },
+            dismiss(id) {
+                const t = this.items.find(i => i.id === id);
+                if (!t) return;
+                t.show = false;
+                setTimeout(() => { this.items = this.items.filter(i => i.id !== id); }, 200);
+            }
+        });
+    }
+});
+</script>
+
+<div
+    x-data="{
+        styles: {
+            soft: {
+                info: 'bg-blue-50 dark:bg-blue-950/90 border-blue-200 dark:border-blue-900 text-blue-800 dark:text-blue-200',
+                success: 'bg-green-50 dark:bg-green-950/90 border-green-200 dark:border-green-900 text-green-800 dark:text-green-200',
+                warning: 'bg-amber-50 dark:bg-amber-950/90 border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-200',
+                error: 'bg-red-50 dark:bg-red-950/90 border-red-200 dark:border-red-900 text-red-800 dark:text-red-200'
+            },
+            solid: {
+                info: 'bg-blue-600 border-transparent text-white',
+                success: 'bg-green-600 border-transparent text-white',
+                warning: 'bg-amber-500 border-transparent text-white',
+                error: 'bg-red-600 border-transparent text-white'
+            },
+            outline: {
+                info: 'bg-white dark:bg-zinc-900 border-blue-300 dark:border-blue-800 text-blue-700 dark:text-blue-300',
+                success: 'bg-white dark:bg-zinc-900 border-green-300 dark:border-green-800 text-green-700 dark:text-green-300',
+                warning: 'bg-white dark:bg-zinc-900 border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-300',
+                error: 'bg-white dark:bg-zinc-900 border-red-300 dark:border-red-800 text-red-700 dark:text-red-300'
+            }
+        },
+        icons: {
+            info: 'M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z',
+            success: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+            warning: 'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z',
+            error: 'M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+        },
+        classesFor(t) { return ((this.styles[t.appearance] || this.styles.soft)[t.variant] || this.styles.soft.info) + ' ' + (t.class || ''); },
+        iconFor(t) { return this.icons[t.variant] || this.icons.info; }
+    }"
+    @toast.window="$store.toasts.add({ position: '{{ position }}', appearance: '{{ appearance }}', duration: {{ duration }}, ...$event.detail })"
+>
+    {% for pos, pos_classes in position_classes.items %}
+        <div class="fixed z-[100] flex flex-col gap-2 w-80 max-w-[calc(100vw-2rem)] pointer-events-none {{ pos_classes }} {{ class }}">
+            <template x-for="t in $store.toasts.items.filter(i => i.position === '{{ pos }}')" :key="t.id">
+                <div
+                    x-show="t.show"
+                    x-cloak
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                    role="status"
+                    class="pointer-events-auto w-full flex gap-3 rounded-box border p-4 shadow-lg"
+                    :class="classesFor(t)"
+                >
+                    <svg class="size-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" :d="iconFor(t)" />
+                    </svg>
+                    <div class="flex-1 min-w-0">
+                        <template x-if="t.title"><div class="font-medium" x-text="t.title"></div></template>
+                        <div class="text-sm opacity-90" :class="{ 'mt-1': t.title }" x-text="t.message"></div>
+                    </div>
+                    <button type="button" @click="$store.toasts.dismiss(t.id)" aria-label="Dismiss" class="shrink-0 opacity-70 hover:opacity-100 transition-opacity">
+                        <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </template>
+        </div>
+    {% endfor %}
+</div>

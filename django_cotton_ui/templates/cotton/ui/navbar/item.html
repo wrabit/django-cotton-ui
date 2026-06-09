@@ -1,31 +1,13 @@
 <c-vars
-    href=""
+    href="#"
     :current="False"
-    icon=""
-    icon_trailing=""
-    badge=""
-    badge_color="zinc"
-    badge_variant=""
+    class=""
 />
 
+{% comment %}Structural link; the parent c-ui.navbar styles items per its `variant`
+   via descendant selectors (keyed on the `is-current` marker), like c-ui.navlist.{% endcomment %}
 <a
     href="{{ href }}"
-    class="
-        relative px-4 py-3 text-sm font-medium transition-colors
-        rounded-t-md
-        {% if current %}
-            text-zinc-900 dark:text-zinc-100 border-b-2 border-accent
-        {% else %}
-            text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100
-        {% endif %}
-    "
-    {{ attrs }}
->
-    <span class="flex items-center gap-2">
-        {{ slot }}
-
-        {% if badge %}
-            <c-ui.badge color="{{ badge_color }}" variant="{{ badge_variant }}" size="sm">{{ badge }}</c-ui.badge>
-        {% endif %}
-    </span>
-</a>
+    {% if current %}aria-current="page"{% endif %}
+    class="{% if current %}is-current {% endif %}{{ class }}"
+>{{ slot }}</a>

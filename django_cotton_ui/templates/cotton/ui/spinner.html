@@ -1,0 +1,24 @@
+<c-vars
+    size="md"
+    :size_classes="{
+        'xs': 'size-3',
+        'sm': 'size-4',
+        'md': 'size-5',
+        'lg': 'size-6',
+        'xl': 'size-8',
+        '2xl': 'size-10'
+    }"
+    color="accent"
+    :color_classes="{
+        'accent': 'text-accent',
+        'zinc': 'text-zinc-500 dark:text-zinc-400',
+        'white': 'text-white',
+        'current': 'text-current'
+    }"
+    class=""
+/>
+
+<svg {{ attrs }} role="status" aria-label="Loading" class="animate-spin {{ size_classes|get_item:size }} {{ color_classes|get_item:color }} {{ class }}" viewBox="0 0 24 24" fill="none">
+  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z"/>
+</svg>

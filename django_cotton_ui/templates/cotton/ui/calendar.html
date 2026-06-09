@@ -1,5 +1,17 @@
-<!-- @props([ 'selected' => '', 'mode' => 'single' , 'onselect' => '', "max" => null, "min" => null, "disabled" => null,
-"required" => false ])-->
+{% comment %}
+Calendar — the date grid used by the datepicker, but also usable standalone as an
+inline / block calendar:
+
+    <c-ui.calendar mode="single" x-model="myDate" />
+
+Props: mode (single | range | multiple), selected, min / max (range length),
+min_date, max_date, disabled_days, disabled_dates. Emits its value via x-model and
+a `change` event.
+
+Note: form submission (hidden input / name) and value_format currently live in the
+datepicker wrapper. If a standalone form use case arrives, lift those down here so
+both the datepicker and a bare calendar serialise consistently.
+{% endcomment %}
 
 <c-vars
     selected=""
@@ -8,27 +20,41 @@
     :max="None"
     :min="None"
     :disabled="None"
+    min_date=""
+    max_date=""
+    :disabled_days="None"
+    :disabled_dates="None"
+    name=""
+    fromName=""
+    toName=""
+    value_format="yyyy-MM-dd"
+    :full="False"
     class
     required="false" />
 
-<div x-data='calendar({{ selected|json_encode }}, "{{ mode }}", {{ disabled|json_encode }} , {{ min|json_encode }}, {{ max|json_encode }}, {{ required|json_encode }})'
+<div x-data='calendar({{ selected|json_encode }}, "{{ mode }}", {{ disabled|json_encode }} , {{ min|json_encode }}, {{ max|json_encode }}, {{ required|json_encode }}, {{ min_date|json_encode }}, {{ max_date|json_encode }}, {{ disabled_days|json_encode }}, {{ disabled_dates|json_encode }}, {{ value_format|json_encode }})'
     x-bind="root"
-    {{ attrs.dict|merge:'class:p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-sm w-[280px]' }}
-    x-modelable="modeHandler.value">
+    {{ attrs }}
+    x-modelable="modeHandler.value"
+    class="p-3 bg-white dark:bg-zinc-800 border border-[color:var(--color-box-border)] rounded-box shadow-sm {% if full %}w-full{% else %}w-[280px]{% endif %} {{ class }}">
     <div class="flex items-center justify-between mb-4">
-        <button x-bind="previousMonthTrigger" type="button"
-            class="inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors">
+        <button type="button" @click="headerPrev()" aria-label="Previous"
+            class="inline-flex items-center justify-center w-7 h-7 rounded-control hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors focus-ring">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </button>
-        <div class="flex items-center gap-1">
-            <span x-bind="monthLabel" class="text-sm font-medium text-zinc-900 dark:text-zinc-100"></span>
-            <span x-bind="yearLabel" class="text-sm font-medium text-zinc-900 dark:text-zinc-100"></span>
-        </div>
-        <button x-bind="nextMonthTrigger" type="button"
-            class="inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors">
+        <button type="button" @click="view === 'days' ? showMonths() : (view === 'months' ? showYears() : null)"
+            class="px-2 py-1 rounded-control text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors focus-ring">
+            <span x-show="view === 'days'"><span x-text="monthNames[month]"></span> <span x-text="year"></span></span>
+            <span x-show="view === 'months'" x-text="year"></span>
+            <span x-show="view === 'years'" x-text="yearRange[0] + ' – ' + yearRange[yearRange.length - 1]"></span>
+        </button>
+        <button type="button" @click="headerNext()" aria-label="Next"
+            class="inline-flex items-center justify-center w-7 h-7 rounded-control hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors focus-ring">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </button>
     </div>
+    <!-- Days view -->
+    <div x-show="view === 'days'">
     <!-- display days of the week -->
     <div class="grid grid-cols-7 mb-2">
         <template x-for="(day, index) in days">
@@ -37,26 +63,59 @@
             </div>
         </template>
     </div>
-    <div class="grid grid-cols-7 gap-1">
+    <div class="grid grid-cols-7 gap-1" @mouseleave="clearHover()">
         <template x-for="blankDay in preBlankDaysInMonth">
-            <div class="flex items-center justify-center h-9 w-9"></div>
+            <div class="flex items-center justify-center h-9 {% if full %}w-full{% else %}w-9{% endif %}"></div>
         </template>
         <template x-for="(day, dayIndex) in daysInMonth" :key="dayIndex">
             <button tabindex="-1" type="button"
                 x-effect="focusedDay == day && ($root.contains($focus.focused()))  && $el.focus({preventScroll: true})"
-                x-text="day" :disabled="isDisabled(new Date(year, month, day))" @click="dayClicked(day);" :class="{
-                        'bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100': isToday(day) == true && isSelectedDay(day) == false && !isDisabled(new Date(year, month, day)),
-                        'text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700': isToday(day) == false && isSelectedDay(day) == false && !isDisabled(new Date(year, month, day)),
-                        'bg-accent text-accent-foreground hover:bg-accent-content focus:bg-accent-content' : isSelectedDay(day) == true && !isDisabled(new Date(year, month, day)),
+                x-text="day" :disabled="isDisabled(new Date(year, month, day))" @click="dayClicked(day);" @mouseenter="dayHovered(day)" :class="{
+                        'bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100': isToday(day) == true && isSelectedDay(day) == false && !isDisabled(new Date(year, month, day)) && !isRangeMiddle(new Date(year, month, day)) && !isInPreviewRange(day),
+                        'text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700': isToday(day) == false && isSelectedDay(day) == false && !isDisabled(new Date(year, month, day)) && !isRangeMiddle(new Date(year, month, day)) && !isInPreviewRange(day),
+                        'bg-accent text-accent-foreground' : (isSelectedDay(day) == true && !isDisabled(new Date(year, month, day))) || isRangeMiddle(new Date(year, month, day)) || isInPreviewRange(day),
                         'text-zinc-300 dark:text-zinc-600 cursor-not-allowed': isDisabled(new Date(year, month, day)),
-                        'ring-2 ring-accent ring-offset-2' : isFocusedDate(day),
-                        'bg-accent/10 dark:bg-accent/20 text-accent dark:text-accent' : isRangeMiddle(new Date(year, month, day)),
                     }"
-                class="flex items-center justify-center h-9 w-9 text-sm rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:cursor-not-allowed">
+                class="flex items-center justify-center h-9 {% if full %}w-full{% else %}w-9{% endif %} text-sm rounded-control transition-colors focus-ring disabled:cursor-not-allowed">
             </button>
         </template>
         <template x-for="blankDay in postBlankDaysInMonth">
-            <div class="flex items-center justify-center h-9 w-9"></div>
+            <div class="flex items-center justify-center h-9 {% if full %}w-full{% else %}w-9{% endif %}"></div>
         </template>
     </div>
+    </div>
+    <!-- /Days view -->
+
+    <!-- Months view -->
+    <div x-show="view === 'months'" x-cloak class="grid grid-cols-3 gap-2">
+        <template x-for="(m, idx) in monthNames" :key="idx">
+            <button type="button" @click="selectMonth(idx)" x-text="m.slice(0, 3)"
+                :class="idx === month ? 'bg-accent text-accent-foreground' : 'text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700'"
+                class="py-2 text-sm rounded-control transition-colors focus-ring"></button>
+        </template>
+    </div>
+
+    <!-- Years view -->
+    <div x-show="view === 'years'" x-cloak class="grid grid-cols-3 gap-2">
+        <template x-for="y in yearRange" :key="y">
+            <button type="button" @click="selectYear(y)" x-text="y"
+                :class="y === year ? 'bg-accent text-accent-foreground' : 'text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700'"
+                class="py-2 text-sm rounded-control transition-colors focus-ring"></button>
+        </template>
+    </div>
+
+    {% comment %}Hidden inputs for form submission. Rendered only when a name is given, so a
+       bare calendar serialises into a form the same way the datepicker does.{% endcomment %}
+    {% if name or fromName or toName %}
+        {% if mode == 'range' %}
+            <input type="hidden" name="{% if fromName %}{{ fromName }}{% else %}{{ name }}['from']{% endif %}" :value="serialize(modeHandler.value?.from)" />
+            <input type="hidden" name="{% if toName %}{{ toName }}{% else %}{{ name }}['to']{% endif %}" :value="serialize(modeHandler.value?.to)" />
+        {% elif mode == 'multiple' %}
+            <template x-for="(item, i) in (modeHandler.value || [])" :key="i">
+                <input type="hidden" name="{{ name }}" :value="serialize(item)" />
+            </template>
+        {% else %}
+            <input type="hidden" name="{{ name }}" :value="serialize(modeHandler.value)" />
+        {% endif %}
+    {% endif %}
 </div>

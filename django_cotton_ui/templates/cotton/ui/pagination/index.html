@@ -1,0 +1,34 @@
+{% load cotton_ui %}
+<c-vars
+    :page_obj="None"
+    param="page"
+    class=""
+/>
+
+<nav aria-label="Pagination" {{ attrs }}>
+  <ul class="flex items-center gap-1 {{ class }}">
+    {% if page_obj is not None %}
+      {% comment %}
+      Auto mode: given a Django Page object, render prev / elided page numbers /
+      next. Pass the compositional sub-components in the slot instead for full control.
+      {% endcomment %}
+      <c-ui.pagination.prev
+        href="{% if page_obj.has_previous %}?{{ param }}={{ page_obj.previous_page_number }}{% endif %}"
+        :disabled="{% if page_obj.has_previous %}False{% else %}True{% endif %}" />
+      {% for num in page_obj|elided_page_range %}
+        {% if num == "..." %}
+          <c-ui.pagination.ellipsis />
+        {% else %}
+          <c-ui.pagination.item
+            href="?{{ param }}={{ num }}"
+            :current="{% if num == page_obj.number %}True{% else %}False{% endif %}">{{ num }}</c-ui.pagination.item>
+        {% endif %}
+      {% endfor %}
+      <c-ui.pagination.next
+        href="{% if page_obj.has_next %}?{{ param }}={{ page_obj.next_page_number }}{% endif %}"
+        :disabled="{% if page_obj.has_next %}False{% else %}True{% endif %}" />
+    {% else %}
+      {{ slot }}
+    {% endif %}
+  </ul>
+</nav>

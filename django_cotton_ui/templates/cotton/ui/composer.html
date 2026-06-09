@@ -1,0 +1,53 @@
+<c-vars
+    name=""
+    placeholder="Send a message…"
+    value=""
+    rows="2"
+    variant="raised"
+    :variant_classes="{
+        'raised': 'bg-[var(--color-surface)]',
+        'flush': 'bg-[var(--color-input-bg)]'
+    }"
+    :disabled="False"
+/>
+
+{% comment %}
+A composer: a focusable shell wrapping a transparent, auto-growing textarea plus an
+actions row. The shell carries the focus ring via `focus-within`, so focusing the
+textarea (or any control inside it) lights the whole box, behaving like one input.
+Fill the `leading` and `trailing` slots with actions (a model picker, mic, send, ...).
+{% endcomment %}
+<div
+    x-data="{
+        grow() {
+            const el = this.$refs.textarea;
+            if (!el) return;
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 320) + 'px';
+        }
+    }"
+    x-init="$nextTick(() => grow())"
+    class="rounded-box border border-zinc-300 dark:border-zinc-700 {{ variant_classes|get_item:variant }} shadow-[var(--shadow-input)]
+           focus-within:ring-[length:var(--focus-ring-width)] focus-within:ring-[var(--focus-ring-color)]
+           transition-colors {% if disabled %}opacity-50{% endif %}"
+>
+    <textarea
+        x-ref="textarea"
+        @input="grow()"
+        name="{{ name }}"
+        rows="{{ rows }}"
+        placeholder="{{ placeholder }}"
+        {% if disabled %}disabled{% endif %}
+        {{ attrs }}
+        class="block w-full resize-none bg-transparent border-0 min-h-[3.5rem] px-4 pt-3 pb-2
+               text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500
+               focus:outline-none focus:ring-0"
+    >{{ value }}</textarea>
+
+    {% if leading or trailing %}
+    <div class="flex items-center justify-between gap-2 px-2.5 pb-2.5 pt-1">
+        <div class="flex items-center gap-1">{{ leading }}</div>
+        <div class="flex items-center gap-1">{{ trailing }}</div>
+    </div>
+    {% endif %}
+</div>

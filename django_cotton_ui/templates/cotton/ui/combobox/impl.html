@@ -11,6 +11,15 @@
     :autoclose="False"
     :disabled="False"
     :required="False"
+    size="md"
+    :size_classes="{
+        'xs': 'text-xs min-h-8 py-0.5 px-1.5',
+        'sm': 'text-sm min-h-9 py-1 px-2',
+        'md': 'text-sm min-h-[42px] py-1.5 px-2',
+        'lg': 'text-base min-h-12 py-2 px-2.5',
+        'xl': 'text-lg min-h-14 py-2.5 px-3',
+        '2xl': 'text-xl min-h-16 py-3 px-3.5'
+    }"
 />
 
 <div x-data="combobox({
@@ -31,22 +40,26 @@
      {{ attrs }}
 >
     <!-- Trigger / Container -->
-    <div @click="openDropdown()"
+    <div x-ref="trigger"
+         @click="openDropdown()"
          @keydown.backspace.prevent="removeLastTag()"
-         @keydown.enter.prevent="openDropdown()"
-         @keydown.space.prevent="openDropdown()"
+         @keydown.enter.prevent="isOpen ? handleEnter() : openDropdown()"
+         @keydown.space.prevent="isOpen ? handleEnter() : openDropdown()"
+         @keydown.arrow-down.prevent="isOpen ? highlightNext() : openDropdown()"
+         @keydown.arrow-up.prevent="isOpen && highlightPrev()"
+         @keydown.escape.stop="isOpen && closeDropdown()"
          tabindex="0"
          class="
-            flex flex-wrap items-center w-full min-h-[42px] py-1.5 px-2 gap-1.5
-            bg-white dark:bg-zinc-800
+            flex flex-wrap items-center w-full gap-1.5 {{ size_classes|get_item:size }}
+            bg-[var(--color-input-bg)]
             border border-zinc-300 dark:border-zinc-700
-            rounded-md shadow-sm
-            focus:ring-2 focus:ring-accent focus:border-accent focus:outline-none
+            rounded-control shadow-[var(--shadow-input)]
+            focus-within:ring-[length:var(--focus-ring-width)] focus-within:ring-[var(--focus-ring-color)]
             transition-all duration-200 cursor-text
          "
          :class="{
             'opacity-60 cursor-not-allowed bg-zinc-50 dark:bg-zinc-900': disabled,
-            'ring-2 ring-accent border-accent': isOpen
+            'ring-[length:var(--focus-ring-width)] ring-[var(--focus-ring-color)]': isOpen
          }">
         
         <!-- Tags -->
@@ -55,7 +68,7 @@
                 <span x-text="tag"></span>
                 <button type="button" 
                         @click.stop="removeTag(tag)" 
-                        class="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full text-zinc-400 hover:bg-zinc-200 hover:text-zinc-600 dark:hover:bg-zinc-600 dark:hover:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-zinc-500"
+                        class="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full text-zinc-400 hover:bg-zinc-200 hover:text-zinc-600 dark:hover:bg-zinc-600 dark:hover:text-zinc-300 focus-ring"
                         :disabled="disabled">
                     <span class="sr-only">Remove tag</span>
                     <svg class="h-3 w-3" stroke="currentColor" fill="none" viewBox="0 0 8 8">
@@ -77,7 +90,8 @@
     </div>
 
     <!-- Dropdown -->
-    <div x-show="isOpen"
+    <div x-ref="content"
+         x-show="isOpen"
          x-transition:enter="transition ease-out duration-100"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -85,7 +99,7 @@
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
          @click.outside="closeDropdown()"
-         class="absolute z-50 left-0 right-0 top-full mt-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg overflow-hidden"
+         class="absolute z-50 left-0 right-0 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-control shadow-lg overflow-hidden"
          style="display: none;">
          
         <!-- Search Input -->
@@ -96,7 +110,7 @@
                    @keydown.escape.stop="closeDropdown()"
                    @keydown.arrow-down.prevent="highlightNext()"
                    @keydown.arrow-up.prevent="highlightPrev()"
-                   class="w-full px-3 py-2 text-sm border border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-200 rounded focus:ring-2 focus:ring-accent focus:border-accent outline-none"
+                   class="w-full px-3 py-2 text-sm border border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-200 rounded-control focus-ring"
                    :placeholder="writable ? 'Search or add new...' : 'Search...'"
                    type="text">
         </div>
@@ -104,15 +118,15 @@
         <!-- Options List -->
         <div class="max-h-60 overflow-y-auto py-1" x-ref="optionsList">
             <template x-for="(option, index) in filteredOptions" :key="index">
-                <div class="px-3 py-2 text-sm cursor-pointer select-none flex items-center justify-between"
+                <div data-combobox-option
+                     class="px-3 py-2 text-sm cursor-pointer select-none flex items-center justify-between text-zinc-900 dark:text-zinc-100"
                      :class="{
-                        'bg-accent text-accent-foreground': index === highlightedIndex,
-                        'text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700': index !== highlightedIndex
+                        'bg-zinc-100 dark:bg-zinc-800': index === highlightedIndex
                      }"
                      @click="selectOption(option)"
                      @mouseover="highlightedIndex = index">
                     <span x-text="option"></span>
-                    <span x-show="tags.includes(option)" class="flex items-center">
+                    <span x-show="tags.includes(option)" class="flex items-center text-accent">
                         <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
                         </svg>
@@ -122,14 +136,13 @@
 
             <!-- Add Custom Tag Option -->
             <div x-show="showCreateOption"
-                 class="px-3 py-2 text-sm cursor-pointer select-none"
+                 class="px-3 py-2 text-sm cursor-pointer select-none text-zinc-500 dark:text-zinc-400"
                  :class="{
-                    'bg-accent text-accent-foreground': highlightedIndex === filteredOptions.length,
-                    'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700': highlightedIndex !== filteredOptions.length
+                    'bg-zinc-100 dark:bg-zinc-800': highlightedIndex === filteredOptions.length
                  }"
                  @click="addTag(searchTerm)"
                  @mouseover="highlightedIndex = filteredOptions.length">
-                Create "<span x-text="searchTerm" class="font-medium" :class="highlightedIndex === filteredOptions.length ? '' : 'text-zinc-900 dark:text-zinc-100'"></span>"
+                Create "<span x-text="searchTerm" class="font-medium text-zinc-900 dark:text-zinc-100"></span>"
             </div>
 
             <div x-show="filteredOptions.length === 0 && (!writable || !searchTerm)" class="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400 text-center">
@@ -145,170 +158,3 @@
         </template>
     </select>
 </div>
-
-<script>
-    document.addEventListener('alpine:init', () => {
-        if (Alpine.data('combobox')) return;
-        
-        Alpine.data('combobox', (config) => ({
-            isOpen: false,
-            highlightedIndex: 0,
-            searchTerm: '',
-            tags: [],
-            options: [],
-            
-            // Config
-            name: config.name,
-            maxTags: config.maxTags,
-            writable: config.writable,
-            searchable: config.searchable,
-            closeAfterSelecting: config.closeAfterSelecting,
-            autoclose: config.autoclose,
-            disabled: config.disabled,
-            placeholder: config.placeholder,
-
-            initSelected(selected_encoded) {
-                let selected = JSON.parse(decodeURIComponent(selected_encoded));
-                this.tags = Array.isArray(selected) ? selected : (selected ? [selected] : []);
-                this.updateHiddenSelect();
-            },
-
-            initOptions(options_encoded) {
-                let options = JSON.parse(decodeURIComponent(options_encoded));
-                this.options = Array.isArray(options) ? options : [];
-            },
-
-            get filteredOptions() {
-                if (!this.searchTerm) return this.options;
-                return this.options.filter(option =>
-                    option.toLowerCase().includes(this.searchTerm.toLowerCase())
-                );
-            },
-
-            get showCreateOption() {
-                return this.writable && this.searchTerm && !this.filteredOptions.includes(this.searchTerm) && !this.tags.includes(this.searchTerm);
-            },
-
-            get hasTagsRemaining() {
-                return this.maxTags > 0 ? this.maxTags > this.tags.length : true
-            },
-
-            get getPlaceholder() {
-                if (this.isOpen && !this.hasTagsRemaining) return 'Maximum reached';
-                if (this.tags.length === 0) {
-                    if (this.placeholder) return this.placeholder;
-                    return this.writable ? 'Search or type new...' : 'Select options...';
-                }
-                return '';
-            },
-
-            openDropdown() {
-                if (this.disabled) return;
-                this.isOpen = true;
-                this.$nextTick(() => {
-                    if (this.searchable || this.writable) {
-                        this.$refs.searchInput.focus();
-                    }
-                    this.highlightedIndex = 0;
-                });
-            },
-
-            closeDropdown() {
-                this.isOpen = false;
-                this.searchTerm = '';
-                this.$el.querySelector('[tabindex="0"]').focus();
-            },
-
-            selectOption(option) {
-                if (this.tags.includes(option)) {
-                    // Option already selected - toggle OFF
-                    this.removeTag(option);
-                } else {
-                    // Option not selected - prepare to add
-
-                    // Single-select mode: auto-replace existing selection
-                    if (this.maxTags === 1 && this.tags.length > 0) {
-                        this.removeTag(this.tags[0]);
-                    }
-
-                    this.addTag(option);
-                }
-            },
-
-            addTag(tag) {
-                if (this.disabled) return;
-                if (this.maxTags !== -1 && this.tags.length >= this.maxTags) return;
-
-                if (!this.tags.includes(tag)) {
-                    this.tags.push(tag);
-                    this.updateHiddenSelect();
-
-                    // Check if we should close the dropdown
-                    const shouldAutoclose = this.autoclose && this.maxTags !== -1 && this.tags.length >= this.maxTags;
-
-                    if (this.closeAfterSelecting || shouldAutoclose) {
-                        this.closeDropdown();
-                    } else {
-                        this.searchTerm = '';
-                        if (this.searchable || this.writable) {
-                            this.$refs.searchInput.focus();
-                        }
-                    }
-                }
-            },
-
-            removeTag(tag) {
-                if (this.disabled) return;
-                this.tags = this.tags.filter(t => t !== tag);
-                this.updateHiddenSelect();
-            },
-
-            removeLastTag() {
-                if (this.tags.length > 0 && !this.searchTerm) {
-                    this.removeTag(this.tags[this.tags.length - 1]);
-                }
-            },
-
-            handleEnter() {
-                // If create option is highlighted (index === filteredOptions.length)
-                if (this.showCreateOption && this.highlightedIndex === this.filteredOptions.length) {
-                    this.addTag(this.searchTerm);
-                } else if (this.filteredOptions.length > 0 && this.highlightedIndex < this.filteredOptions.length) {
-                    this.selectOption(this.filteredOptions[this.highlightedIndex]);
-                } else if (this.writable && this.searchTerm) {
-                    this.addTag(this.searchTerm);
-                }
-            },
-
-            highlightNext() {
-                const maxIndex = this.showCreateOption ? this.filteredOptions.length : this.filteredOptions.length - 1;
-                if (this.highlightedIndex < maxIndex) {
-                    this.highlightedIndex++;
-                    this.scrollToHighlighted();
-                }
-            },
-
-            highlightPrev() {
-                if (this.highlightedIndex > 0) {
-                    this.highlightedIndex--;
-                    this.scrollToHighlighted();
-                }
-            },
-
-            scrollToHighlighted() {
-                // Implementation for scrolling to highlighted item
-                // This would require refs on the items or querySelector
-            },
-
-            updateHiddenSelect() {
-                // Handled by Alpine's x-model on hidden select? 
-                // No, we are manually building options.
-                // Actually, x-ref="hiddenSelect" content is rebuilt by x-for.
-                // But we need to trigger change event for forms?
-                this.$nextTick(() => {
-                    this.$dispatch('change', this.tags);
-                });
-            }
-        }))
-    })
-</script>

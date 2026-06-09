@@ -4,6 +4,7 @@ export default () => ({
     align: 'start',
     offset: 4,
     responsive: false,
+    collapsible: false,
 
     init() {
         // Keep the open menu correctly placed when the viewport changes
@@ -29,6 +30,14 @@ export default () => ({
 
     positionDropdown() {
         if (!this.$refs.content || !this.$refs.trigger) return;
+
+        // Collapsible mode on small screens: the panel renders in-flow (CSS) as an inline
+        // disclosure, so clear any floating offsets and skip positioning entirely.
+        if (this.collapsible && window.innerWidth < 768) {
+            const c = this.$refs.content;
+            c.style.top = c.style.bottom = c.style.left = c.style.right = c.style.transform = '';
+            return;
+        }
 
         const trigger = this.$refs.trigger.getBoundingClientRect();
         const content = this.$refs.content;
@@ -119,7 +128,7 @@ export default () => ({
             return ['dropdown-menu'];
         },
         ['@click.outside.capture']() {
-            //dont close when event is from content and trigger, especially when teleported
+            // Keep open when the click originates from the content or trigger (e.g. teleported content)
             if (!this.$refs.content.contains(this.$event.target) && !this.$refs.trigger.contains(this.$event.target)) {
                 return this.close();
             }

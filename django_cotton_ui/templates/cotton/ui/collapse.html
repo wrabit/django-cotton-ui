@@ -1,11 +1,17 @@
-<c-vars trigger_text trigger :expanded="False" />
+<c-vars trigger_text trigger trigger_class="inline-flex items-center gap-1.5" :expanded="False" :chevron="True" />
 
 <div x-data="{ expanded: {{ expanded|lower }} }">
-    {% if trigger %}
-        <span @click="expanded = ! expanded" class="cursor-pointer">{{ trigger }}</span>
-    {% else %}
-        <button @click="expanded = ! expanded">{% firstof trigger_text "Toggle" %}</button>
-    {% endif %}
+    <button type="button" @click="expanded = ! expanded" class="cursor-pointer text-left {{ trigger_class }}">
+        {% if trigger %}{{ trigger }}{% else %}<span>{% firstof trigger_text "Toggle" %}</span>{% endif %}
+        {% if chevron %}
+        {# Chevron is added automatically next to any trigger; the component rotates it. #}
+        <span class="shrink-0 transition-transform duration-200" :class="{ 'rotate-180': expanded }">
+            {% if icon %}{{ icon }}{% else %}
+            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+            {% endif %}
+        </span>
+        {% endif %}
+    </button>
 
     <div x-show="expanded" x-collapse x-cloak>
         {{ slot }}

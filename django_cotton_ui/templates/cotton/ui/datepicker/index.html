@@ -1,0 +1,25 @@
+<c-vars
+    label=""
+    description=""
+    description_trailing=""
+    error=""
+    badge=""
+    form
+    name=""
+/>
+
+{% if label or description or description_trailing or error %}
+    <c-ui.field
+        label="{{ label }}"
+        description="{{ description }}"
+        description_trailing="{{ description_trailing }}"
+        error="{{ error }}"
+        badge="{{ badge }}"
+        :form="form"
+        name="{{ name }}">
+
+        <c-ui.datepicker.impl name="{{ name }}" :attrs="attrs" />
+    </c-ui.field>
+{% else %}
+    <c-ui.datepicker.impl name="{{ name }}" :attrs="attrs" />
+{% endif %}

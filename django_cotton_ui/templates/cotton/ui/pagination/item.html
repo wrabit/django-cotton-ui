@@ -1,0 +1,14 @@
+<c-vars
+    href=""
+    :current="False"
+    :disabled="False"
+    class=""
+/>
+
+<li>
+  <a href="{% if disabled or current %}#{% else %}{{ href }}{% endif %}"
+     {% if current %}aria-current="page"{% endif %}
+     class="inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-control text-sm transition-colors focus-ring {% if current %}bg-accent text-accent-foreground{% elif disabled %}text-zinc-300 dark:text-zinc-600 pointer-events-none{% else %}text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800{% endif %} {{ class }}">
+    {{ slot }}
+  </a>
+</li>

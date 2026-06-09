@@ -1,6 +1,6 @@
 <c-vars
     color="zinc"
-    size=""
+    size="md"
     variant=""
     :inset="False"
     href=""
@@ -45,9 +45,12 @@
         'rose': 'bg-rose-600 text-white dark:bg-rose-500'
     }"
     :size_classes="{
+        'xs': 'text-[10px] px-1.5 py-0.5',
         'sm': 'text-xs px-1.5 py-0.5',
-        '': 'text-xs px-2 py-1',
-        'lg': 'text-sm px-2.5 py-1'
+        'md': 'text-xs px-2 py-1',
+        'lg': 'text-sm px-2.5 py-1',
+        'xl': 'text-sm px-3 py-1.5',
+        '2xl': 'text-base px-3.5 py-1.5'
     }"
 />
 
@@ -55,7 +58,7 @@
 <a
     href="{{ href }}"
     {{ attrs }}
-    class="inline-flex items-center gap-1 font-medium transition-opacity hover:opacity-80 {% if variant == 'pill' %}rounded-full{% else %}rounded-md{% endif %} {{ size_classes|get_item:size }} {% if variant == 'solid' %}{{ solid_classes|get_item:color }}{% else %}{{ color_classes|get_item:color }}{% endif %} {% if inset %}{% if 'top' in inset %}-mt-1{% endif %} {% if 'bottom' in inset %}-mb-1{% endif %} {% if 'left' in inset %}-ml-1{% endif %} {% if 'right' in inset %}-mr-1{% endif %}{% endif %}"
+    class="inline-flex items-center gap-1 font-medium transition-opacity hover:opacity-80 {% if variant == 'pill' %}rounded-full{% else %}rounded-control{% endif %} {{ size_classes|get_item:size }} {% if variant == 'solid' %}{{ solid_classes|get_item:color }}{% else %}{{ color_classes|get_item:color }}{% endif %} {% if inset %}{% if 'top' in inset %}-mt-1{% endif %} {% if 'bottom' in inset %}-mb-1{% endif %} {% if 'left' in inset %}-ml-1{% endif %} {% if 'right' in inset %}-mr-1{% endif %}{% endif %}"
 >
     {% if icon_leading %}
         <span class="{% if size == 'sm' %}size-3{% elif size == 'lg' %}size-4{% else %}size-3{% endif %}">
@@ -72,7 +75,7 @@
 {% else %}
 <span
     {{ attrs }}
-    class="inline-flex items-center gap-1 font-medium {% if variant == 'pill' %}rounded-full{% else %}rounded-md{% endif %} {{ size_classes|get_item:size }} {% if variant == 'solid' %}{{ solid_classes|get_item:color }}{% else %}{{ color_classes|get_item:color }}{% endif %} {% if inset %}{% if 'top' in inset %}-mt-1{% endif %} {% if 'bottom' in inset %}-mb-1{% endif %} {% if 'left' in inset %}-ml-1{% endif %} {% if 'right' in inset %}-mr-1{% endif %}{% endif %}"
+    class="inline-flex items-center gap-1 font-medium {% if variant == 'pill' %}rounded-full{% else %}rounded-control{% endif %} {{ size_classes|get_item:size }} {% if variant == 'solid' %}{{ solid_classes|get_item:color }}{% else %}{{ color_classes|get_item:color }}{% endif %} {% if inset %}{% if 'top' in inset %}-mt-1{% endif %} {% if 'bottom' in inset %}-mb-1{% endif %} {% if 'left' in inset %}-ml-1{% endif %} {% if 'right' in inset %}-mr-1{% endif %}{% endif %}"
 >
     {% if icon_leading %}
         <span class="{% if size == 'sm' %}size-3{% elif size == 'lg' %}size-4{% else %}size-3{% endif %}">

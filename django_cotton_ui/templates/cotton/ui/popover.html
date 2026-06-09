@@ -1,0 +1,95 @@
+<c-vars
+    position="bottom"
+    open_on="click"
+    :offset="8"
+    :open_delay="120"
+    :close_delay="200"
+    class=""
+/>
+
+<div
+    x-data="{
+        open: false,
+        mode: '{{ open_on }}',
+        _openT: null,
+        _closeT: null,
+        init() {
+            this._cleanupReposition = window.CottonUI.watchReposition(() => {
+                if (this.open) this.position();
+            });
+        },
+        destroy() {
+            this._cleanupReposition && this._cleanupReposition();
+            clearTimeout(this._openT);
+            clearTimeout(this._closeT);
+        },
+        position() {
+            window.CottonUI.positionPopover(this.$refs.trigger, this.$refs.panel, {
+                position: '{{ position }}', align: 'center', offset: {{ offset }}, responsive: true,
+            });
+        },
+        doOpen() {
+            clearTimeout(this._closeT);
+            if (this.open) return;
+            this.open = true;
+            this.$nextTick(() => this.position());
+            this.$dispatch('popover-open');
+        },
+        doClose() {
+            clearTimeout(this._openT);
+            if (!this.open) return;
+            this.open = false;
+            this.$dispatch('popover-close');
+        },
+        toggle() { this.open ? this.doClose() : this.doOpen(); },
+        close() { this.doClose(); },
+        onEnter() {
+            if (this.mode !== 'hover') return;
+            clearTimeout(this._closeT);
+            this._openT = setTimeout(() => this.doOpen(), {{ open_delay }});
+        },
+        onLeave() {
+            if (this.mode !== 'hover') return;
+            clearTimeout(this._openT);
+            this._closeT = setTimeout(() => this.doClose(), {{ close_delay }});
+        }
+    }"
+    @keydown.escape.window="doClose()"
+    @click.outside="doClose()"
+    @mouseenter="onEnter()"
+    @mouseleave="onLeave()"
+    {{ attrs }}
+    data-popover
+    class="relative inline-block"
+>
+    {% comment %}
+    Trigger: click toggles in click mode; in hover mode opening/closing is driven
+    by the root's mouseenter/mouseleave (with intent delays) instead.
+    {% endcomment %}
+    <div x-ref="trigger" @click="mode === 'click' && toggle()" :aria-expanded="open" class="inline-block">
+        {{ trigger }}
+    </div>
+
+    {% comment %}
+    Outer frame is placed by the shared positioning helper (it owns top/left and,
+    for centered alignment, a translateX transform). The inner panel owns the
+    enter/leave transition, so its scale transform never fights the helper's
+    alignment transform and it stays invisible until it has been positioned.
+    {% endcomment %}
+    <div x-ref="panel" class="absolute z-50">
+        <div
+            x-show="open"
+            x-cloak
+            x-transition:enter="transition ease-out duration-100"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            role="dialog"
+            class="w-max max-w-xs rounded-box border border-[color:var(--color-box-border)] bg-white dark:bg-zinc-800 p-4 shadow-lg text-sm text-zinc-700 dark:text-zinc-200 {{ class }}"
+        >
+            {{ slot }}
+        </div>
+    </div>
+</div>

@@ -1,56 +1,81 @@
 /*
- * Cotton UI Component Styles
+ * Cotton UI styles — the kit's single stylesheet.
  *
- * This file provides component-specific CSS variables and styles.
- * It does NOT import Tailwind - the host app should do that.
+ * Import once into your Tailwind v4 entry, AFTER `@import "tailwindcss"`:
  *
- * Usage in host app's CSS:
- *   @import "tailwindcss";
- *   @source "path/to/cotton_ui/templates/**/*.html";
+ *     @import "tailwindcss";
+ *     @import "<path>/static/cotton-ui/cotton-ui.css";
+ *     @source "<path>/templates";
  *
- * Accent colors (Flux-style pattern):
- * The host app defines accent colors in their @theme block:
+ * One import compiles everything the components need into your CSS: the accent
+ * palette (neutral zinc by default), the component tokens (radius, surfaces,
+ * shadows, focus ring) and the Alpine `x-cloak` rule.
  *
- *   @theme {
- *       --color-accent: var(--color-teal-500);
- *       --color-accent-content: var(--color-teal-600);
- *       --color-accent-foreground: var(--color-white);
- *   }
+ * Note: `@import` this into your Tailwind entry (it contains `@theme`); do NOT
+ * `<link>` it at runtime. To brand the kit, override --color-accent in your own
+ * @theme AFTER this import:
  *
- *   @layer theme {
- *       .dark {
- *           --color-accent: var(--color-teal-400);
- *           --color-accent-content: var(--color-teal-300);
- *           --color-accent-foreground: var(--color-teal-950);
- *       }
- *   }
+ *     @theme { --color-accent: var(--color-teal-500); --color-accent-content: var(--color-teal-600); }
+ *     @layer theme { .dark { --color-accent: var(--color-teal-400); --color-accent-content: var(--color-teal-300); } }
  */
 
-/* Component theming variables */
-:root {
-    /* Border radius */
-    --radius: 0.5rem;
+@theme {
+    --color-accent: var(--color-zinc-900);
+    --color-accent-content: var(--color-zinc-700);
+    --color-accent-foreground: var(--color-white);
 
-    /* Form input focus ring */
-    --focus-ring-width: 2px;
-    --focus-ring-offset: 0px;
-    --focus-ring-color: var(--color-accent);
-    --focus-ring-offset-color: #ffffff;
+    /* Radius is split by role, not by size, and kept in its own namespace so it never
+       collides with Tailwind's --radius-md/-lg scale or your own rounded-* usage.
+       Declared in @theme so the `rounded-control` / `rounded-box` utilities are generated. */
+    --radius-control: 0.375rem;   /* form controls: inputs, buttons → rounded-control */
+    --radius-box: 0.5rem;         /* structural: cards, dialogs, menus → rounded-box */
 }
 
-/* Dark mode overrides */
-.dark {
-    /* Form input focus ring in dark mode */
-    --focus-ring-offset-color: #18181b; /* zinc-900 */
+/* The remaining component tokens live in the `theme` layer so a consumer's @theme /
+   @layer theme overrides always win (light and dark stay in the same layer, no cascade upset). */
+@layer theme {
+    :root {
+        --color-bg: var(--color-zinc-50);       /* page base */
+        --color-surface: #ffffff;               /* raised: cards, dialogs, menus */
+        --color-input-bg: transparent;          /* form fields: border-defined in light; see .dark for the lift */
+        --color-box-border: var(--color-zinc-200);  /* border for box-role surfaces (cards, dialogs, menus); set transparent for a shadow-only look. NOT inputs (see --radius-control). */
+
+        --shadow-input: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-box: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+        --focus-ring-width: 2px;
+        --focus-ring-offset: 0px;
+        --focus-ring-color: color-mix(in oklab, var(--color-accent) 50%, white);
+        --focus-ring-offset-color: #ffffff;
+    }
+
+    .dark {
+        --color-accent: var(--color-zinc-100);
+        --color-accent-content: var(--color-zinc-300);
+        --color-accent-foreground: var(--color-zinc-900);
+        --color-bg: var(--color-zinc-900);
+        --color-surface: var(--color-zinc-800);
+        --color-box-border: var(--color-zinc-700);
+        /* Inputs lift off any surface (page or card) via a translucent lighten. */
+        --color-input-bg: color-mix(in oklab, white 4%, transparent);
+        --focus-ring-offset-color: #18181b; /* zinc-900 */
+    }
 }
 
-/* Alpine.js x-cloak directive */
+/* Unified focus indicator. Add `focus-ring` to any interactive element for a flush,
+   translucent accent ring on keyboard focus. Uses `outline` so it follows border-radius,
+   never clashes with the element's box-shadow, and is not clipped by overflow. Themeable
+   via --focus-ring-width / --focus-ring-color / --focus-ring-offset (see the theme builder). */
+@utility focus-ring {
+    /* Solid 2px accent ring just outside the resting border, on keyboard focus.
+       The always-present transparent outline avoids a colour flash and suppresses the
+       UA default; only the colour changes on focus-visible. */
+    outline: var(--focus-ring-width) solid transparent;
+    outline-offset: var(--focus-ring-offset);
+    &:focus-visible { outline-color: var(--focus-ring-color); }
+}
+
+/* Alpine.js x-cloak */
 [x-cloak] {
     display: none !important;
-}
-
-/* Base component styles */
-body {
-    font-synthesis-weight: none;
-    text-rendering: optimizeLegibility;
 }

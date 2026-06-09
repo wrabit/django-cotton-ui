@@ -4,16 +4,22 @@
     :disabled="False"
     :checked="False"
     :accent="True"
-    size=""
+    size="md"
     :size_classes="{
+        'xs': 'h-4 w-7',
         'sm': 'h-5 w-9',
-        '': 'h-6 w-11',
-        'lg': 'h-7 w-14'
+        'md': 'h-6 w-11',
+        'lg': 'h-7 w-14',
+        'xl': 'h-8 w-16',
+        '2xl': 'h-9 w-[4.5rem]'
     }"
     :indicator_classes="{
+        'xs': 'h-3 w-3',
         'sm': 'h-4 w-4',
-        '': 'h-5 w-5',
-        'lg': 'h-6 w-6'
+        'md': 'h-5 w-5',
+        'lg': 'h-6 w-6',
+        'xl': 'h-7 w-7',
+        '2xl': 'h-8 w-8'
     }"
 />
 
@@ -34,30 +40,42 @@
         role="switch"
         x-bind="trigger"
         {{ attrs }}
-        class="relative inline-flex items-center rounded-full transition-colors
+        class="relative inline-flex items-center rounded-full focus-ring
                {{ size_classes|get_item:size }}
                {% if disabled %}opacity-50 cursor-not-allowed{% else %}cursor-pointer{% endif %}"
         :class="{
+            'transition-colors': ready,
             {% if accent %}
             'bg-accent': switchOn,
             {% else %}
-            'bg-zinc-900 dark:bg-zinc-100': switchOn,
+            'bg-[var(--color-muted,currentColor)]': switchOn,
             {% endif %}
             'bg-zinc-200 dark:bg-zinc-700': !switchOn
         }"
     >
         <span
-            class="inline-block transform rounded-full bg-white dark:bg-zinc-900 shadow-lg transition-transform
+            class="inline-block transform rounded-full bg-white dark:bg-zinc-900 shadow-lg
                    {{ indicator_classes|get_item:size }}"
             :class="{
-                {% if size == 'sm' %}
-                'translate-x-4': switchOn,
+                'transition-transform': ready,
+                {% comment %}On-position is symmetric: track - thumb - 0.125rem, so the right gap matches the 0.125rem top/bottom/left gap.{% endcomment %}
+                {% if size == 'xs' %}
+                'translate-x-[0.875rem]': switchOn,
+                'translate-x-0.5': !switchOn
+                {% elif size == 'sm' %}
+                'translate-x-[1.125rem]': switchOn,
                 'translate-x-0.5': !switchOn
                 {% elif size == 'lg' %}
-                'translate-x-7': switchOn,
+                'translate-x-[1.875rem]': switchOn,
+                'translate-x-0.5': !switchOn
+                {% elif size == 'xl' %}
+                'translate-x-[2.125rem]': switchOn,
+                'translate-x-0.5': !switchOn
+                {% elif size == '2xl' %}
+                'translate-x-[2.375rem]': switchOn,
                 'translate-x-0.5': !switchOn
                 {% else %}
-                'translate-x-5': switchOn,
+                'translate-x-[1.375rem]': switchOn,
                 'translate-x-0.5': !switchOn
                 {% endif %}
             }"
