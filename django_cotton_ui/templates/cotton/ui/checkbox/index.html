@@ -26,12 +26,16 @@
 
         if (variant === 'default') {
             // Base layout classes are static, no dynamic classes needed for default
-        } else if (variant === 'buttons') {
-            classes.push('px-4', 'py-2', 'font-medium', 'transition-colors', 'border-r', 'border-zinc-200', 'dark:border-zinc-700', 'last:border-r-0', 'first:rounded-l-lg', 'last:rounded-r-lg');
+        } else if (variant === 'segmented') {
+            classes.push('px-4', 'py-2', 'font-medium', 'transition-[background-color,color]', 'border-r', 'border-zinc-200', 'dark:border-zinc-700', 'last:border-r-0', 'first:rounded-l-[var(--radius-control)]', 'last:rounded-r-[var(--radius-control)]');
             if ($data.isChecked('{{ value }}')) {
-                classes.push('bg-zinc-100', 'dark:bg-zinc-800');
+                {% if accent %}
+                classes.push('bg-accent', 'text-accent-foreground');
+                {% else %}
+                classes.push('bg-zinc-100', 'dark:bg-zinc-700');
+                {% endif %}
             } else {
-                classes.push('hover:bg-zinc-50', 'dark:hover:bg-zinc-700');
+                classes.push('hover:bg-zinc-50', 'dark:hover:bg-zinc-700/50');
             }
         } else if (variant === 'cards') {
             classes.push('flex', 'flex-1', 'gap-4', 'rounded-box', 'border-2', 'p-4', 'transition-[background-color]');
@@ -64,8 +68,8 @@
     {% if slot %}
         {{ slot }}
     {% else %}
-        {% comment %}Checkbox indicator (default and cards variants only, hidden for buttons){% endcomment %}
-        <div x-show="{% if show_indicator %}(() => { const v = $el.closest('[data-variant]')?.dataset.variant || 'default'; return v !== 'buttons'; })(){% else %}false{% endif %}" class="flex items-center mt-0.5 h-5">
+        {% comment %}Checkbox indicator (default and cards variants only, hidden for segmented){% endcomment %}
+        <div x-show="{% if show_indicator %}(() => { const v = $el.closest('[data-variant]')?.dataset.variant || 'default'; return v !== 'segmented'; })(){% else %}false{% endif %}" class="flex items-center mt-0.5 h-5">
             <div class="flex items-center justify-center w-4 h-4 border-2 border-zinc-300 dark:border-zinc-600 rounded transition-all"
                  :class="{
                      {% if accent %}

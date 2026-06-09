@@ -34,7 +34,11 @@
         } else if (variant === 'segmented') {
             classes.push('px-4', 'py-2', 'font-medium', 'transition-[background-color,color]', 'border-r', 'border-zinc-200', 'dark:border-zinc-700', 'last:border-r-0', 'first:rounded-l-[var(--radius-control)]', 'last:rounded-r-[var(--radius-control)]');
             if ($data.isSelected('{{ value }}')) {
+                {% if accent %}
+                classes.push('bg-accent', 'text-accent-foreground');
+                {% else %}
                 classes.push('bg-zinc-100', 'dark:bg-zinc-700');
+                {% endif %}
             } else {
                 classes.push('hover:bg-zinc-50', 'dark:hover:bg-zinc-700/50');
             }

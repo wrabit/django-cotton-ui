@@ -2768,6 +2768,7 @@ var dropdownMenu_default = () => ({
   align: "start",
   offset: 4,
   responsive: false,
+  collapsible: false,
   init() {
     let ticking = false;
     this._reposition = () => {
@@ -2791,6 +2792,11 @@ var dropdownMenu_default = () => ({
   positionDropdown() {
     if (!this.$refs.content || !this.$refs.trigger)
       return;
+    if (this.collapsible && window.innerWidth < 768) {
+      const c = this.$refs.content;
+      c.style.top = c.style.bottom = c.style.left = c.style.right = c.style.transform = "";
+      return;
+    }
     const trigger = this.$refs.trigger.getBoundingClientRect();
     const content = this.$refs.content;
     const offset = parseInt(this.offset);

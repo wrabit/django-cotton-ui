@@ -99,7 +99,7 @@
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
          @click.outside="closeDropdown()"
-         class="absolute z-50 left-0 right-0 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-control shadow-lg overflow-hidden"
+         class="absolute z-50 left-0 right-0 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-control shadow-lg overflow-hidden"
          style="display: none;">
          
         <!-- Search Input -->
@@ -119,15 +119,14 @@
         <div class="max-h-60 overflow-y-auto py-1" x-ref="optionsList">
             <template x-for="(option, index) in filteredOptions" :key="index">
                 <div data-combobox-option
-                     class="px-3 py-2 text-sm cursor-pointer select-none flex items-center justify-between"
+                     class="px-3 py-2 text-sm cursor-pointer select-none flex items-center justify-between text-zinc-900 dark:text-zinc-100"
                      :class="{
-                        'bg-accent text-accent-foreground': index === highlightedIndex,
-                        'text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700': index !== highlightedIndex
+                        'bg-zinc-100 dark:bg-zinc-800': index === highlightedIndex
                      }"
                      @click="selectOption(option)"
                      @mouseover="highlightedIndex = index">
                     <span x-text="option"></span>
-                    <span x-show="tags.includes(option)" class="flex items-center">
+                    <span x-show="tags.includes(option)" class="flex items-center text-accent">
                         <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
                         </svg>
@@ -137,14 +136,13 @@
 
             <!-- Add Custom Tag Option -->
             <div x-show="showCreateOption"
-                 class="px-3 py-2 text-sm cursor-pointer select-none"
+                 class="px-3 py-2 text-sm cursor-pointer select-none text-zinc-500 dark:text-zinc-400"
                  :class="{
-                    'bg-accent text-accent-foreground': highlightedIndex === filteredOptions.length,
-                    'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700': highlightedIndex !== filteredOptions.length
+                    'bg-zinc-100 dark:bg-zinc-800': highlightedIndex === filteredOptions.length
                  }"
                  @click="addTag(searchTerm)"
                  @mouseover="highlightedIndex = filteredOptions.length">
-                Create "<span x-text="searchTerm" class="font-medium" :class="highlightedIndex === filteredOptions.length ? '' : 'text-zinc-900 dark:text-zinc-100'"></span>"
+                Create "<span x-text="searchTerm" class="font-medium text-zinc-900 dark:text-zinc-100"></span>"
             </div>
 
             <div x-show="filteredOptions.length === 0 && (!writable || !searchTerm)" class="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400 text-center">

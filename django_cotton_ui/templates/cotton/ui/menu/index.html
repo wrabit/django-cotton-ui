@@ -14,7 +14,7 @@
         selected: '{{ value }}' || null,
         selectedLabel: '',
         selectedOption: null,
-        highlightedIndex: 0,
+        highlightedIndex: -1,
         options: [],
         disabled: {{ disabled|lower }},
 
@@ -99,8 +99,13 @@
                 if (this.open) {
                     this.$nextTick(() => {
                         this.position();
+                        // Start keyboard navigation at the current selection (-1 = none highlighted).
+                        this.highlightedIndex = this.filteredOptions.findIndex(o => o.value === this.selected);
+                        // Focus so arrow keys reach the content's keydown handlers: the search
+                        // input if there is one, otherwise the content panel itself.
                         const searchInput = this.$el.querySelector('[data-select-search]');
                         if (searchInput) searchInput.focus();
+                        else this.$refs.content?.focus();
                     });
                 }
             }

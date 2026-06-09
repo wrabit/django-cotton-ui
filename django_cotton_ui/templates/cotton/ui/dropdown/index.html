@@ -5,11 +5,12 @@
   trigger_text=""
   min_width="12rem"
   :auto_position="True"
+  :collapsible="False"
 />
 
 <div
   x-data="dropdownMenu()"
-  x-init="position = '{{ position }}'; align = '{{ align }}'; offset = {{ offset }}; responsive = {{ auto_position|lower }}; $watch('dropdownMenu', value => { if (value) positionDropdown() })"
+  x-init="position = '{{ position }}'; align = '{{ align }}'; offset = {{ offset }}; responsive = {{ auto_position|lower }}; collapsible = {{ collapsible|lower }} || !!$root.closest('[data-dropdown-collapse]'); $watch('dropdownMenu', value => { if (value) positionDropdown() })"
   x-bind="root"
   @dropdown-close="close()"
   {{ attrs }}
@@ -52,14 +53,17 @@
     x-ref="content"
     x-bind="content"
     x-cloak
-    class="absolute z-50 rounded-box border shadow-lg
+    class="z-50 rounded-box border shadow-lg
            border-[color:var(--color-box-border)]
            bg-white dark:bg-zinc-900
            max-h-[calc(100vh-4rem)] sm:max-h-[80vh]
            overflow-y-auto overflow-x-hidden
            scrollbar-thin scrollbar-thumb-zinc-400 scrollbar-track-zinc-100
            dark:scrollbar-thumb-zinc-600 dark:scrollbar-track-zinc-800"
-    style="min-width: {{ min_width }}"
+    :class="collapsible
+              ? 'static md:absolute w-full min-w-0 md:w-auto md:min-w-[var(--dd-min)] mt-1 md:mt-0'
+              : 'absolute min-w-[var(--dd-min)]'"
+    style="--dd-min: {{ min_width }}"
     role="menu"
     aria-orientation="vertical">
     {{ slot }}
