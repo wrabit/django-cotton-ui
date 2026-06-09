@@ -9,8 +9,8 @@ import esbuild from 'esbuild';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Output to Django static directory
-const outDir = `../static/cotton-ui`;
+// Output to Django static directory (package lives under django_cotton_ui/)
+const outDir = `../django_cotton_ui/static/cotton-ui`;
 
 build({
     entryPoints: [`js/cotton-ui.js`],

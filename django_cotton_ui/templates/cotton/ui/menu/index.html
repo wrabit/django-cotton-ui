@@ -3,7 +3,7 @@
     placeholder="Select an option"
     value=""
     :disabled="False"
-    size=""
+    size="md"
     :required="False"
 />
 
@@ -47,6 +47,21 @@
                     }
                 }
             });
+
+            // Keep the open menu within the viewport (flip up when no room below).
+            this._cleanupReposition = window.CottonUI.watchReposition(() => {
+                if (this.open) this.position();
+            });
+        },
+
+        destroy() {
+            this._cleanupReposition && this._cleanupReposition();
+        },
+
+        position() {
+            window.CottonUI.positionPopover(this.$refs.trigger, this.$refs.content, {
+                position: 'bottom', align: 'stretch', offset: 8, responsive: true,
+            });
         },
 
         get filteredOptions() {
@@ -83,6 +98,7 @@
                 this.open = !this.open;
                 if (this.open) {
                     this.$nextTick(() => {
+                        this.position();
                         const searchInput = this.$el.querySelector('[data-select-search]');
                         if (searchInput) searchInput.focus();
                     });

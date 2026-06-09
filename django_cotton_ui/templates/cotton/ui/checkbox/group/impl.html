@@ -2,6 +2,7 @@
     name=""
     :values="[]"
     variant="default"
+    :horizontal="False"
     class=""
 />
 
@@ -20,9 +21,9 @@
 >
     <div
         {% if variant == 'default' %}
-            class="space-y-3 {{ class }}"
+            class="{% if horizontal %}flex flex-wrap items-center gap-x-6 gap-y-2{% else %}space-y-3{% endif %} {{ class }}"
         {% elif variant == 'buttons' %}
-            class="inline-flex rounded-lg border border-zinc-200 dark:border-zinc-700 {{ class }}"
+            class="inline-flex rounded-box border border-zinc-200 dark:border-zinc-700 {{ class }}"
         {% elif variant == 'cards' %}
             class="flex gap-4 w-full {{ class }}"
         {% endif %}

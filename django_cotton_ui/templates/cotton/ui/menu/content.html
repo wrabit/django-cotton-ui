@@ -13,8 +13,9 @@
     @keydown.down.prevent="highlightNext()"
     @keydown.up.prevent="highlightPrev()"
     @keydown.enter.prevent="selectHighlighted()"
+    x-ref="content"
     {{ attrs }}
-    class="absolute z-50 w-full mt-2 rounded-lg border bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 shadow-lg {{ max_height }} overflow-auto text-left"
+    class="absolute z-50 w-full rounded-box border bg-white dark:bg-zinc-900 border-[color:var(--color-box-border)] shadow-lg {{ max_height }} overflow-auto text-left"
     style="display: none;"
 >
     {{ slot }}

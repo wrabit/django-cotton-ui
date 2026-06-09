@@ -119,7 +119,7 @@ export default () => ({
             return ['dropdown-menu'];
         },
         ['@click.outside.capture']() {
-            //dont close when event is from content and trigger, especially when teleported
+            // Keep open when the click originates from the content or trigger (e.g. teleported content)
             if (!this.$refs.content.contains(this.$event.target) && !this.$refs.trigger.contains(this.$event.target)) {
                 return this.close();
             }

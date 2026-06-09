@@ -1,0 +1,56 @@
+<c-vars class="" />
+
+{% comment %}
+Wrap your nav in this component, mark each page section with `data-spy-section id="..."`,
+then bind link styling to `isActive('id')`. An IntersectionObserver tracks which section
+is in view and exposes `active` (the current id) on the Alpine component.
+
+By default it watches the viewport (page scroll). If you nest the sections inside an element
+marked `data-spy-root` (a fixed-height, overflow-scrolling container), that container is used
+as the observer root instead, for a self-contained scroll area. The data factory is registered
+once and guarded so multiple includes never double-register.
+{% endcomment %}
+<script>
+document.addEventListener('alpine:init', () => {
+    if (window.Alpine && !window.Alpine.__cottonScrollspy) {
+        window.Alpine.__cottonScrollspy = true;
+        Alpine.data('cottonScrollspy', () => ({
+            active: null,
+            _observer: null,
+            init() {
+                // A nested [data-spy-root] scopes the observer to that scroll container;
+                // otherwise sections are tracked against the viewport.
+                const scopeRoot = this.$root.querySelector('[data-spy-root]');
+                const searchIn = scopeRoot || document;
+                const sections = Array.from(searchIn.querySelectorAll('[data-spy-section]'));
+                if (!sections.length) return;
+                this._observer = new IntersectionObserver((entries) => {
+                    // the topmost section currently intersecting the upper part of the root wins
+                    const visible = entries.filter(e => e.isIntersecting)
+                        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+                    if (visible.length) this.active = visible[0].target.id;
+                }, { root: scopeRoot || null, rootMargin: '0px 0px -55% 0px', threshold: 0 });
+                sections.forEach(s => this._observer.observe(s));
+                this.active = this.active || sections[0].id;
+            },
+            destroy() { this._observer && this._observer.disconnect(); },
+            isActive(id) { return this.active === id; },
+            scrollTo(id) {
+                const root = this.$root.querySelector('[data-spy-root]');
+                // `root` is an element (no getElementById); scope the lookup with querySelector.
+                const target = root ? root.querySelector('#' + CSS.escape(id)) : document.getElementById(id);
+                if (!target) return;
+                if (root) {
+                    // scroll only the container, never the page. Honour the target's
+                    // scroll-margin-top (e.g. a `scroll-mt-*` class) so it lands just above the anchor.
+                    const offset = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+                    root.scrollTo({ top: root.scrollTop + target.getBoundingClientRect().top - root.getBoundingClientRect().top - offset, behavior: 'smooth' });
+                } else {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        }));
+    }
+});
+</script>
+<div x-data="cottonScrollspy" {{ attrs }} class="{{ class }}">{{ slot }}</div>

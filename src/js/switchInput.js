@@ -1,6 +1,12 @@
 export default (disabled = false, checked = false) => ({
     switchOn: checked,
     disabled: disabled,
+    // Transitions are enabled only after the first frame so the thumb/track render
+    // at their initial position instantly instead of animating into place on load.
+    ready: false,
+    init() {
+        this.$nextTick(() => { this.ready = true; });
+    },
     trigger: {
         ['@click']() {
             this.toggle()

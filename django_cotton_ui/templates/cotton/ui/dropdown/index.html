@@ -27,12 +27,13 @@
       x-ref="trigger"
       x-bind="trigger"
       class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium
-             rounded-md border transition-colors
+             rounded-control border transition-colors
              border-zinc-300 dark:border-zinc-700
              bg-zinc-50 dark:bg-zinc-800
              text-zinc-700 dark:text-zinc-300
              hover:bg-zinc-100 dark:hover:bg-zinc-700
-             focus:outline-none focus:ring-2 focus:ring-accent"
+             focus-ring"
+      :class="{ 'ring-[length:var(--focus-ring-width)] ring-[var(--focus-ring-color)]': dropdownMenu }"
       aria-haspopup="true"
       :aria-expanded="dropdownMenu">
       {{ trigger_text }}
@@ -51,8 +52,8 @@
     x-ref="content"
     x-bind="content"
     x-cloak
-    class="absolute z-50 rounded-lg border shadow-lg
-           border-zinc-200 dark:border-zinc-700
+    class="absolute z-50 rounded-box border shadow-lg
+           border-[color:var(--color-box-border)]
            bg-white dark:bg-zinc-900
            max-h-[calc(100vh-4rem)] sm:max-h-[80vh]
            overflow-y-auto overflow-x-hidden

@@ -1,11 +1,13 @@
+import { format as dateFormat } from "date-fns"
 import Matcher from "./Calendar/Matcher"
 import MultipleModeHandler from "./Calendar/ModeHandlers/MultipleModeHandler"
 import RangeModeHandler from "./Calendar/ModeHandlers/RangeModeHandler"
 import SingleModeHandler from "./Calendar/ModeHandlers/SingleModeHandler"
 
-export default (selected, mode, disabled, min, max, required) => ({
+export default (selected, mode, disabled, min, max, required, min_date, max_date, disabled_days, disabled_dates, value_format) => ({
     focusedDay: '',
     mode: mode,
+    value_format: value_format || 'yyyy-MM-dd',
     max: max,
     min: min,
     month: '',
@@ -13,6 +15,9 @@ export default (selected, mode, disabled, min, max, required) => ({
     daysInMonth: [],
     preBlankDaysInMonth: [],
     postBlankDaysInMonth: [],
+    hoveredDate: null,
+    view: 'days',
+    yearRangeStart: '',
     modeHandler: null,
     disabled: [],
     monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -75,6 +80,12 @@ export default (selected, mode, disabled, min, max, required) => ({
             this.disabled = [new Matcher(disabled)]
         }
 
+        // Convenience limit props -> Matcher rules
+        if (min_date) this.disabled.push(new Matcher({ before: min_date }));
+        if (max_date) this.disabled.push(new Matcher({ after: max_date }));
+        if (disabled_days != null) this.disabled.push(new Matcher({ dayOfWeek: disabled_days }));
+        if (Array.isArray(disabled_dates) && disabled_dates.length) this.disabled.push(new Matcher({ dates: disabled_dates }));
+
         let now = new Date();
         this.month = now.getMonth();
         this.year = now.getFullYear();
@@ -87,6 +98,10 @@ export default (selected, mode, disabled, min, max, required) => ({
     },
     dispatchChange() {
         this.$nextTick(() => { this.$dispatch('change', { value: this.modeHandler.value }) })
+    },
+    // Format a single date for form submission (local, no UTC round-trip).
+    serialize(date) {
+        return date == null ? '' : dateFormat(new Date(date), this.value_format)
     },
     dayClicked(date) {
         let selectedDate = new Date(this.year, this.month, date);
@@ -155,8 +170,10 @@ export default (selected, mode, disabled, min, max, required) => ({
         //if the length of the preblank arrays is a multiple of the week, it is considered an entire week
         preBlankdaysArray = preBlankdaysArray.reverse();
         let postBlankdaysArray = [];
-        // always display 6 rows
-        for (var i = 1; i <= (this.days.length * 6 - (preBlankdaysArray.length + daysInMonth)); i++) {
+        // Pad only to complete the final week (no trailing empty rows).
+        let usedCells = preBlankdaysArray.length + daysInMonth;
+        let totalCells = Math.ceil(usedCells / this.days.length) * this.days.length;
+        for (var i = 1; i <= (totalCells - usedCells); i++) {
             postBlankdaysArray.push(i);
         }
         let daysArray = [];
@@ -176,5 +193,49 @@ export default (selected, mode, disabled, min, max, required) => ({
         }
 
         return false
+    },
+    dayHovered(day) {
+        if (mode == 'range') {
+            this.hoveredDate = new Date(this.year, this.month, day);
+        }
+    },
+    clearHover() {
+        this.hoveredDate = null;
+    },
+    isInPreviewRange(day) {
+        if (mode != 'range' || typeof this.modeHandler.isInPreviewRange !== 'function') {
+            return false;
+        }
+        return this.modeHandler.isInPreviewRange(new Date(this.year, this.month, day), this.hoveredDate);
+    },
+    showMonths() {
+        this.view = 'months';
+    },
+    showYears() {
+        this.yearRangeStart = this.year - 6;
+        this.view = 'years';
+    },
+    selectMonth(m) {
+        this.month = m;
+        this.view = 'days';
+        this.calculateDays();
+    },
+    selectYear(y) {
+        this.year = y;
+        this.view = 'months';
+    },
+    headerPrev() {
+        if (this.view === 'months') { this.year--; }
+        else if (this.view === 'years') { this.yearRangeStart -= 12; }
+        else { this.previousMonth(); }
+    },
+    headerNext() {
+        if (this.view === 'months') { this.year++; }
+        else if (this.view === 'years') { this.yearRangeStart += 12; }
+        else { this.nextMonth(); }
+    },
+    get yearRange() {
+        let start = this.yearRangeStart || (this.year - 6);
+        return Array.from({ length: 12 }, (_, i) => start + i);
     }
 })

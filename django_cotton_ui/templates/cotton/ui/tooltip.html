@@ -2,15 +2,40 @@
     position="top"
     :offset="4"
     content
-    :interactive="False"
+    size="md"
+    :arrow="True"
+    :open="False"
+    :size_classes="{
+        'xs': 'px-1.5 py-0.5 text-xs',
+        'sm': 'px-2 py-1 text-xs',
+        'md': 'px-3 py-1.5 text-sm',
+        'lg': 'px-4 py-2.5 text-base',
+        'xl': 'px-5 py-3 text-lg',
+        '2xl': 'px-6 py-3.5 text-xl',
+    }"
 />
 
 <div
     x-data="{
-        open: false,
-        hoverState: { trigger: false, tooltip: false },
+        forceOpen: {{ open|yesno:'true,false' }},
+        open: {{ open|yesno:'true,false' }},
+        hoverState: { trigger: false },
         hideTimeout: null,
         tooltipPosition: { x: 0, y: 0 },
+        arrowOffset: 0,
+        currentPos: '{{ position }}',
+        init() {
+            // The tooltip is positioned in document space (position: absolute), so it
+            // tracks the trigger during scroll natively with no lag. Only re-run the
+            // placement maths on resize.
+            this._onResize = () => { if (this.open) this.updatePosition(); };
+            window.addEventListener('resize', this._onResize);
+            // Pinned-open tooltips position themselves on load.
+            if (this.forceOpen) this.$nextTick(() => requestAnimationFrame(() => this.updatePosition()));
+        },
+        destroy() {
+            window.removeEventListener('resize', this._onResize);
+        },
         enterTrigger() {
             this.hoverState.trigger = true;
             this.checkOpen();
@@ -19,25 +44,20 @@
             this.hoverState.trigger = false;
             this.checkClose();
         },
-        enterTooltip() {
-            this.hoverState.tooltip = true;
-            this.checkOpen();
-        },
-        leaveTooltip() {
-            this.hoverState.tooltip = false;
-            this.checkClose();
-        },
         checkOpen() {
             clearTimeout(this.hideTimeout);
             if (!this.open) {
                 this.open = true;
-                this.$nextTick(() => this.updatePosition());
             }
+            // nextTick + rAF so the teleported tooltip is displayed and laid out
+            // before we measure it (avoids the open-low/off-to-the-side glitch).
+            this.$nextTick(() => requestAnimationFrame(() => this.updatePosition()));
         },
         checkClose() {
+            if (this.forceOpen) return;
             clearTimeout(this.hideTimeout);
             this.hideTimeout = setTimeout(() => {
-                if (!this.hoverState.trigger && !this.hoverState.tooltip) {
+                if (!this.hoverState.trigger) {
                     this.open = false;
                 }
             }, 80);
@@ -50,31 +70,104 @@
             if (!trigger || !tooltip) return;
 
             const triggerRect = trigger.getBoundingClientRect();
-            const tooltipRect = tooltip.getBoundingClientRect();
-            const gap = {{ offset }};
+            // Measure with offset* (layout size) not getBoundingClientRect, so the
+            // enter-scale transform doesn't shrink the reading. Bail and retry if the
+            // element hasn't been laid out yet (its size would read as 0).
+            const tw = tooltip.offsetWidth;
+            const th = tooltip.offsetHeight;
+            if (tw === 0 || th === 0) {
+                requestAnimationFrame(() => this.updatePosition());
+                return;
+            }
+            {% comment %}When the arrow is shown it pokes ~4px out of the tooltip, so add that
+               to the gap and the configured offset becomes the space past the arrow tip.{% endcomment %}
+            const gap = {{ offset }} + {% if arrow %}4{% else %}0{% endif %};
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const margin = 8;
+
+            // Pick a side: try the requested placement, then its opposite, then the
+            // other axis, and use the first one where the tooltip can stay in the
+            // viewport while still pointing at (overlapping) the trigger. This means a
+            // top/bottom tooltip will move to the left/right when the trigger nears a
+            // horizontal edge, and vice versa.
+            const spaceAbove = triggerRect.top - gap - margin;
+            const spaceBelow = vh - triggerRect.bottom - gap - margin;
+            const spaceLeft = triggerRect.left - gap - margin;
+            const spaceRight = vw - triggerRect.right - gap - margin;
+            const keepX = Math.min(triggerRect.width, tw, 24);
+            const keepY = Math.min(triggerRect.height, th, 24);
+            // Can a top/bottom tooltip be placed so it stays on screen AND overlaps the
+            // trigger horizontally? (and the equivalent for left/right vertically)
+            const xOverlaps = Math.max(margin, triggerRect.left - tw + keepX) <= Math.min(vw - tw - margin, triggerRect.right - keepX);
+            const yOverlaps = Math.max(margin, triggerRect.top - th + keepY) <= Math.min(vh - th - margin, triggerRect.bottom - keepY);
+            const fits = {
+                top: spaceAbove >= th && xOverlaps,
+                bottom: spaceBelow >= th && xOverlaps,
+                left: spaceLeft >= tw && yOverlaps,
+                right: spaceRight >= tw && yOverlaps,
+            };
+            const order = {
+                top: ['top', 'bottom', 'left', 'right'],
+                bottom: ['bottom', 'top', 'left', 'right'],
+                left: ['left', 'right', 'top', 'bottom'],
+                right: ['right', 'left', 'top', 'bottom'],
+            }['{{ position }}'];
+            let pos = order.find(function (p) { return fits[p]; }) || '{{ position }}';
 
             let x = 0, y = 0;
 
-            switch ('{{ position }}') {
+            switch (pos) {
                 case 'top':
-                    x = triggerRect.left + (triggerRect.width / 2) - (tooltipRect.width / 2);
-                    y = triggerRect.top - tooltipRect.height - gap;
+                    x = triggerRect.left + (triggerRect.width / 2) - (tw / 2);
+                    y = triggerRect.top - th - gap;
                     break;
                 case 'bottom':
-                    x = triggerRect.left + (triggerRect.width / 2) - (tooltipRect.width / 2);
+                    x = triggerRect.left + (triggerRect.width / 2) - (tw / 2);
                     y = triggerRect.bottom + gap;
                     break;
                 case 'left':
-                    x = triggerRect.left - tooltipRect.width - gap;
-                    y = triggerRect.top + (triggerRect.height / 2) - (tooltipRect.height / 2);
+                    x = triggerRect.left - tw - gap;
+                    y = triggerRect.top + (triggerRect.height / 2) - (th / 2);
                     break;
                 case 'right':
                     x = triggerRect.right + gap;
-                    y = triggerRect.top + (triggerRect.height / 2) - (tooltipRect.height / 2);
+                    y = triggerRect.top + (triggerRect.height / 2) - (th / 2);
                     break;
             }
 
-            this.tooltipPosition = { x, y };
+            // Nudge into the viewport on the CROSS axis only, and keep it overlapping the
+            // trigger there. The main axis stays anchored to the trigger, so when the
+            // trigger scrolls out of view the tooltip follows it off screen instead of
+            // sticking to the viewport edge.
+            if (pos === 'top' || pos === 'bottom') {
+                x = Math.max(margin, Math.min(x, vw - tw - margin));
+                x = Math.max(triggerRect.left - tw + keepX, Math.min(x, triggerRect.right - keepX));
+            } else {
+                y = Math.max(margin, Math.min(y, vh - th - margin));
+                y = Math.max(triggerRect.top - th + keepY, Math.min(y, triggerRect.bottom - keepY));
+            }
+
+            // Arrow offset: aim at the trigger's centre, but clamp into the tooltip body
+            // and the overlap with the trigger, so the tail keeps pointing at the target
+            // (and stays just inside its edge) even when the tooltip is shifted.
+            // pad must clear the corner radius (~6px) plus the rotated arrow's half-width
+            // (~6px) so the arrow base never overhangs the rounded corner.
+            const pad = 10;
+            if (pos === 'top' || pos === 'bottom') {
+                const center = triggerRect.left + triggerRect.width / 2;
+                const aim = Math.max(Math.max(x, triggerRect.left) + pad, Math.min(center, Math.min(x + tw, triggerRect.right) - pad));
+                this.arrowOffset = Math.max(pad, Math.min(aim - x, tw - pad));
+            } else {
+                const center = triggerRect.top + triggerRect.height / 2;
+                const aim = Math.max(Math.max(y, triggerRect.top) + pad, Math.min(center, Math.min(y + th, triggerRect.bottom) - pad));
+                this.arrowOffset = Math.max(pad, Math.min(aim - y, th - pad));
+            }
+
+            this.currentPos = pos;
+            // Document coordinates, so the absolutely-positioned tooltip scrolls with the
+            // page in lockstep with the trigger.
+            this.tooltipPosition = { x: x + window.scrollX, y: y + window.scrollY };
         }
     }"
     class="relative inline-block"
@@ -104,14 +197,20 @@
             x-transition:leave-end="opacity-0 scale-95"
             x-ref="tooltip"
             role="tooltip"
-            {% if interactive %}
-            @mouseenter="enterTooltip()"
-            @mouseleave="leaveTooltip()"
-            {% endif %}
-            class="fixed z-50 rounded-md bg-zinc-900 dark:bg-zinc-700 px-3 py-1.5 text-sm font-medium text-white shadow-lg {% if not interactive %}pointer-events-none{% endif %}"
+            class="absolute z-50 w-max max-w-xs rounded-control bg-zinc-900 dark:bg-zinc-700 {{ size_classes|get_item:size }} font-medium text-white shadow-lg pointer-events-none"
             :style="`left: ${tooltipPosition.x}px; top: ${tooltipPosition.y}px;`"
         >
             {{ content }}
+            {% if arrow %}
+            {# Tail: a rotated square at the edge facing the trigger; follows the flipped side #}
+            <div
+                class="absolute w-2 h-2 bg-zinc-900 dark:bg-zinc-700"
+                :style="currentPos === 'top'    ? `left:${arrowOffset}px; bottom:-4px; transform:translateX(-50%) rotate(45deg)`
+                      : currentPos === 'bottom' ? `left:${arrowOffset}px; top:-4px; transform:translateX(-50%) rotate(45deg)`
+                      : currentPos === 'left'   ? `top:${arrowOffset}px; right:-4px; transform:translateY(-50%) rotate(45deg)`
+                      :                           `top:${arrowOffset}px; left:-4px; transform:translateY(-50%) rotate(45deg)`"
+            ></div>
+            {% endif %}
         </div>
     </template>
 </div> 

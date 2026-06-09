@@ -8,11 +8,12 @@
     form
     name
     :for="None"
+    class=""
 />
 
 {% if variant == 'toggle' %}
     {% comment %}Toggle row: label/description stacked on the left, control pushed right.{% endcomment %}
-    <div {{ attrs }} class="space-y-1.5">
+    <div {{ attrs }} class="space-y-1.5 {{ class }}">
         <div class="flex items-start justify-between gap-4">
             <div class="space-y-1">
                 {% if label %}
@@ -34,7 +35,7 @@
         {% endif %}
     </div>
 {% else %}
-    <div {{ attrs }} class="{% if variant == 'inline' %}flex items-start gap-4{% else %}space-y-1.5{% endif %}">
+    <div {{ attrs }} class="{% if variant == 'inline' %}flex items-start gap-4{% else %}space-y-1.5{% endif %} {{ class }}">
         {% if label %}
             <c-ui.label badge="{{ badge }}" :for="for">{{ label }}</c-ui.label>
         {% endif %}

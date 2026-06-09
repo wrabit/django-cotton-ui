@@ -25,20 +25,20 @@
         <div
             x-show="expanded"
             x-collapse
-            class="space-y-1 pl-2"
+            class="pl-2"
         >
             {{ slot }}
         </div>
     </div>
 {% else %}
-    <div class="space-y-1">
+    <div class="pt-5 first:pt-0">
         {% if heading %}
-            <div class="px-3 py-2 font-semibold text-zinc-500 dark:text-zinc-400">
+            <div class="px-2 pb-2 text-sm text-zinc-400 dark:text-zinc-500">
                 {{ heading }}
             </div>
         {% endif %}
 
-        <div class="space-y-1 pl-2">
+        <div class="pl-2">
             {{ slot }}
         </div>
     </div>

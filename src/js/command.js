@@ -88,7 +88,7 @@ export default (value) => ({
     },
     commandGroupContainer: {
         ['x-effect']() {
-            this.keyword == ''; // dont delete this helps with reactivity
+            this.keyword; // referenced so Alpine re-runs this effect when the keyword changes
             this.$nextTick(() => {
                 this.$el.style.display = this.$el.querySelectorAll('[data-active=true]').length > 0 ? 'block' : 'none'
             })
@@ -96,7 +96,7 @@ export default (value) => ({
     },
     commandEmpty: {
         ['x-effect']() {
-            this.keyword == ''; // dont delete this helps with reactivity
+            this.keyword; // referenced so Alpine re-runs this effect when the keyword changes
             this.$nextTick(() => {
                 this.$el.style.display = this.$refs.list.querySelectorAll('[data-active=true]').length > 0 ? 'none' : 'block'
             })

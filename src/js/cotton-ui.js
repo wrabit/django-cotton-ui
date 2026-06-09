@@ -5,6 +5,7 @@ import avatar from './avatar.js';
 import banner from './banner.js';
 import calendar from './calendar.js';
 import checkbox from './checkbox.js';
+import combobox from './combobox.js';
 import command from './command.js';
 import datePicker from './datePicker.js';
 import dialog from './dialog.js';
@@ -15,6 +16,13 @@ import radio from './radio.js';
 import select from './select.js';
 import sheet from './sheet.js';
 import switchInput from './switchInput.js';
+import { positionPopover, watchReposition } from './positioning.js';
+
+// Expose the shared positioning helpers so components defined inline in templates
+// (menu, tooltip) can reuse the same collision-aware logic as the JS factories.
+window.CottonUI = window.CottonUI || {};
+window.CottonUI.positionPopover = positionPopover;
+window.CottonUI.watchReposition = watchReposition;
 
 document.addEventListener('alpine:init', () => {
     Alpine.data('accordion', accordion)
@@ -24,6 +32,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('banner', banner)
     Alpine.data('calendar', calendar)
     Alpine.data('checkbox', checkbox)
+    Alpine.data('combobox', combobox)
     Alpine.data('command', command)
     Alpine.data('datePicker', datePicker)
     Alpine.data('dialog', dialog)

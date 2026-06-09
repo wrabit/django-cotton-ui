@@ -25,7 +25,7 @@ class="w-full space-y-4"
     <div class="
         flex items-center
         {% if variant == 'segmented' %}
-            bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg
+            bg-zinc-100 dark:bg-zinc-800 p-1 rounded-box
         {% else %}
             border-b border-zinc-200 dark:border-zinc-700 w-full
         {% endif %}
@@ -35,14 +35,14 @@ class="w-full space-y-4"
             <button type="button"
                 @click="activeTab = tab.name"
                 class="
-                    inline-flex items-center justify-center whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+                    inline-flex items-center justify-center whitespace-nowrap transition-all focus-ring
                     disabled:pointer-events-none disabled:opacity-50
                     {% if size == 'sm' %}text-xs px-2.5 py-1
                     {% elif size == 'lg' %}text-base px-4 py-2
                     {% else %}text-sm px-3 py-1.5{% endif %}
 
                     {% if variant == 'segmented' %}
-                        rounded-md font-medium
+                        rounded-control font-medium
                     {% else %}
                         border-b-2 -mb-px font-medium rounded-t-md
                     {% endif %}
@@ -68,7 +68,7 @@ class="w-full space-y-4"
     </div>
 
     <!-- Panels -->
-    <div class="mt-2 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 dark:ring-offset-zinc-950 dark:focus-visible:ring-300">
+    <div class="mt-2 focus-ring">
         {{ slot }}
     </div>
 </div>

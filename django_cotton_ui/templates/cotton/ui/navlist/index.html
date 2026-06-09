@@ -1,10 +1,44 @@
 <c-vars
+    variant=""
+    :persist_scroll="False"
+    scroll_key="navlist"
     class=""
 />
 
+{% comment %}
+Vertical nav for sidebars. The container styles its item links via descendant
+selectors (keyed on the `.is-current` marker the item adds when current), so
+items stay structural.
+  - default: filled active rows
+  - variant="sidebar": accent left-bar rail (continuous, no row gap)
+
+When `persist_scroll` is set and the navlist is its own scroll container
+(give it a max-height plus overflow-y-auto), it remembers its scroll position
+across full page loads via sessionStorage, keyed on `scroll_key`. It only restores
+that position when you navigated via a link inside this navlist, so arriving from an
+unrelated page (a top nav, an external link) starts at the top rather than resuming a
+stale position. Useful for long sidebars so the list does not jump to the top on every
+in-nav navigation.
+{% endcomment %}
 <nav
-    {{ attrs.dict|merge:'class:flex flex-col gap-1' }}
     data-navlist
+    {% if persist_scroll %}
+    x-data
+    x-init="if (sessionStorage.getItem('cotton-navlist-armed:{{ scroll_key }}')) { $el.scrollTop = +(sessionStorage.getItem('cotton-navlist:{{ scroll_key }}') || 0); sessionStorage.removeItem('cotton-navlist-armed:{{ scroll_key }}') }"
+    @click="if ($event.target.closest('a')) { sessionStorage.setItem('cotton-navlist:{{ scroll_key }}', $el.scrollTop); sessionStorage.setItem('cotton-navlist-armed:{{ scroll_key }}', '1') }"
+    {% endif %}
+    class="
+    {% if variant == 'sidebar' %}flex flex-col
+        [&_a]:flex [&_a]:items-center [&_a]:justify-between [&_a]:gap-3 [&_a]:border-l-2 [&_a]:pl-4 [&_a]:pr-2 [&_a]:py-1 [&_a]:font-normal [&_a]:transition-colors
+        [&_a]:border-zinc-200 dark:[&_a]:border-zinc-800 [&_a]:text-zinc-600 dark:[&_a]:text-zinc-400 [&_a:hover]:text-zinc-900 dark:[&_a:hover]:text-zinc-100
+        [&_.is-current]:border-accent [&_.is-current]:text-zinc-900 dark:[&_.is-current]:text-white [&_.is-current]:font-semibold
+    {% else %}flex flex-col gap-1
+        [&_a]:flex [&_a]:items-center [&_a]:justify-between [&_a]:gap-3 [&_a]:px-3 [&_a]:py-2 [&_a]:rounded-control [&_a]:font-medium [&_a]:transition-colors
+        [&_a]:text-zinc-600 dark:[&_a]:text-zinc-400 [&_a:hover]:bg-zinc-50 dark:[&_a:hover]:bg-zinc-800/50 [&_a:hover]:text-zinc-900 dark:[&_a:hover]:text-zinc-100
+        [&_.is-current]:bg-zinc-100 [&_.is-current]:text-zinc-900 dark:[&_.is-current]:bg-zinc-800 dark:[&_.is-current]:text-zinc-100
+    {% endif %}
+    {{ class }}"
+    {{ attrs }}
 >
     {{ slot }}
 </nav>

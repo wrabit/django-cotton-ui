@@ -10,6 +10,7 @@ authors = ["Will Abbott <willabb83@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 packages = [{include = "django_cotton_ui"}]
+exclude = ["django_cotton_ui/static/cotton-ui/*.map"]
 homepage = "https://github.com/wrabit/django-cotton-ui"
 repository = "https://github.com/wrabit/django-cotton-ui"
 keywords = ["django", "components", "ui", "tailwind", "alpine"]

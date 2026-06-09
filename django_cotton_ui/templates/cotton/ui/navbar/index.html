@@ -1,10 +1,74 @@
 <c-vars
+    :sticky="True"
+    :sheet="False"
+    variant="text"
     class=""
 />
 
-<nav
-    {{ attrs.dict|merge:'class:flex items-center gap-1 border-b border-zinc-200 dark:border-zinc-700' }}
-    data-navbar
+{% comment %}Responsive navbar with a baked-in mobile burger. The default slot (nav items)
+   and `actions` are mirrored into the mobile menu automatically. `variant` styles the
+   desktop items: text (default), underline, pill or ghost. The mobile menu always uses a
+   plain stacked style regardless of variant. Use the `drawer` slot for content shown only
+   in the mobile menu (e.g. a c-ui.navlist). Set :sheet="True" to open the mobile menu as a
+   slide-over instead of an inline collapse.{% endcomment %}
+<header
+    {{ attrs }}
+    class="{% if sticky %}sticky top-0 z-40{% endif %} w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur {{ class }}"
+    x-data="{ open: false }"
 >
-    {{ slot }}
-</nav>
+    <div class="flex h-14 items-center gap-4 px-4">
+        <div class="flex items-center gap-2 shrink-0">{{ brand }}</div>
+
+        <nav class="hidden md:flex items-center gap-1 [&>a]:text-sm [&>a]:font-medium [&>a]:transition-colors
+            {% if variant == 'underline' %}
+                [&>a]:px-1 [&>a]:py-2 [&>a]:border-b-2 [&>a]:border-transparent [&>a]:text-zinc-600 dark:[&>a]:text-zinc-400 [&>a:hover]:text-zinc-900 dark:[&>a:hover]:text-white [&>.is-current]:text-zinc-900 dark:[&>.is-current]:text-white [&>.is-current]:border-accent
+            {% elif variant == 'pill' %}
+                [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-zinc-600 dark:[&>a]:text-zinc-300 [&>a:hover]:bg-zinc-100 dark:[&>a:hover]:bg-zinc-800 [&>.is-current]:bg-accent [&>.is-current]:text-accent-foreground
+            {% elif variant == 'ghost' %}
+                [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-zinc-600 dark:[&>a]:text-zinc-400 [&>a:hover]:bg-zinc-100 dark:[&>a:hover]:bg-zinc-800 [&>a:hover]:text-zinc-900 dark:[&>a:hover]:text-white [&>.is-current]:text-accent
+            {% else %}
+                [&>a]:px-2 [&>a]:py-2 [&>a]:text-zinc-600 dark:[&>a]:text-zinc-400 [&>a:hover]:text-zinc-900 dark:[&>a:hover]:text-white [&>.is-current]:text-accent
+            {% endif %}">{{ slot }}</nav>
+
+        <div class="ml-auto hidden md:flex items-center gap-2">{{ actions }}</div>
+
+        {# mobile hamburger #}
+        <button
+            type="button"
+            @click="open = !open"
+            class="ml-auto md:hidden inline-flex items-center justify-center rounded-control p-2 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-ring"
+            :aria-expanded="open"
+            aria-label="Toggle menu"
+        >
+            <svg x-show="!open" class="size-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg x-show="open" x-cloak class="size-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18" />
+            </svg>
+        </button>
+    </div>
+
+    {% if sheet %}
+        {# mobile menu as a drawer; the burger's `open` drives it via x-model #}
+        <c-ui.drawer x-model="open" class="md:hidden">
+            <c-slot name="content">
+                <nav class="flex flex-col gap-1 [&>a]:text-sm [&>a]:font-medium [&>a]:transition-colors [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-zinc-600 dark:[&>a]:text-zinc-400 [&>a:hover]:bg-zinc-100 dark:[&>a:hover]:bg-zinc-800 [&>.is-current]:text-accent">{{ slot }}</nav>
+                {% if actions %}<div class="flex flex-col gap-2 pt-4 mt-4 border-t border-zinc-200 dark:border-zinc-800">{{ actions }}</div>{% endif %}
+                {% if drawer %}<div class="pt-4 mt-4 border-t border-zinc-200 dark:border-zinc-800">{{ drawer }}</div>{% endif %}
+            </c-slot>
+        </c-ui.drawer>
+    {% else %}
+        {# mobile menu as an inline collapse (default) #}
+        <div
+            x-show="open"
+            x-cloak
+            x-collapse
+            class="md:hidden border-t border-zinc-200 dark:border-zinc-800 px-4 py-3 space-y-1"
+        >
+            <nav class="flex flex-col gap-1 [&>a]:text-sm [&>a]:font-medium [&>a]:transition-colors [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-zinc-600 dark:[&>a]:text-zinc-400 [&>a:hover]:bg-zinc-100 dark:[&>a:hover]:bg-zinc-800 [&>.is-current]:text-accent">{{ slot }}</nav>
+            <div class="flex flex-col gap-2 pt-2">{{ actions }}</div>
+            {% if drawer %}<div class="pt-3 mt-2 border-t border-zinc-200 dark:border-zinc-800">{{ drawer }}</div>{% endif %}
+        </div>
+    {% endif %}
+</header>

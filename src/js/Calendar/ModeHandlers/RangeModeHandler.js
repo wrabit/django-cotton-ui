@@ -79,6 +79,20 @@ export default class RangeModeHandler {
         return false
     }
 
+    // True while a start is chosen but the end is not yet (selecting the 2nd endpoint).
+    get hasOpenRange() {
+        return !!(this._value && this._value.from && this._value.to == null);
+    }
+
+    // Days between the chosen start and the currently hovered date (live preview).
+    isInPreviewRange(date, hoverDate) {
+        if (!this.hasOpenRange || !hoverDate) return false;
+        const from = this._value.from.getTime();
+        const hover = hoverDate.getTime();
+        const t = date.getTime();
+        return t >= Math.min(from, hover) && t <= Math.max(from, hover);
+    }
+
     createDateWithoutTime(value) {
         let date = new Date(value)
         date.setHours(0, 0, 0, 0);
