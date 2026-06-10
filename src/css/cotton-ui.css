@@ -1,23 +1,5 @@
-/*
- * Cotton UI styles — the kit's single stylesheet.
- *
- * Import once into your Tailwind v4 entry, AFTER `@import "tailwindcss"`:
- *
- *     @import "tailwindcss";
- *     @import "<path>/static/cotton-ui/cotton-ui.css";
- *     @source "<path>/templates";
- *
- * One import compiles everything the components need into your CSS: the accent
- * palette (neutral zinc by default), the component tokens (radius, surfaces,
- * shadows, focus ring) and the Alpine `x-cloak` rule.
- *
- * Note: `@import` this into your Tailwind entry (it contains `@theme`); do NOT
- * `<link>` it at runtime. To brand the kit, override --color-accent in your own
- * @theme AFTER this import:
- *
- *     @theme { --color-accent: var(--color-teal-500); --color-accent-content: var(--color-teal-600); }
- *     @layer theme { .dark { --color-accent: var(--color-teal-400); --color-accent-content: var(--color-teal-300); } }
- */
+/* Cotton UI tokens: accent palette, component tokens (radius, surfaces, shadows,
+   focus ring) and x-cloak. Brand by overriding --color-accent via :root / .dark. */
 
 @theme {
     --color-accent: var(--color-zinc-900);
