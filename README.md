@@ -54,7 +54,10 @@ Browse the full set with live examples in the [ui docs](https://django-cotton.co
 
 ## Roadmap
 
-- a CDN-hosted stylesheet
+- Publish and document CDN-hosted stylesheet for quick prototyping
+- Convert all docs to markdown source
+- Add a llms.txt
+- More components
 
 ## License
 
