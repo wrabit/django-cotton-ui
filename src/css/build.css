@@ -1,0 +1,33 @@
+/*
+ * Build entry for the SHIPPED, precompiled stylesheet.
+ *
+ * This compiles every utility the kit's component templates use, plus the kit's
+ * tokens / focus-ring / x-cloak, into a single self-contained file that consumers
+ * just <link> (no @source into site-packages, no Tailwind build required on their
+ * side). Brand it by overriding the CSS variables (--color-accent, etc.) after it.
+ *
+ * Output: django_cotton_ui/static/cotton-ui/cotton-ui.css
+ */
+@import "tailwindcss";
+
+/* Class-based dark mode. The kit's token blocks (--color-surface, etc.) are
+   scoped to a `.dark` class, so the generated dark: utilities must match: without
+   this, Tailwind defaults dark: to a prefers-color-scheme media query, and a
+   system set to dark would fire dark: utilities (light text, dark borders) while
+   the .dark tokens stay light, giving light-on-light.
+
+   The :not(:where(.light, .light *)) opt-out lets a nested `.light` subtree force
+   light mode even inside a `.dark` ancestor (handy for theme switchers that set
+   html.light, and for rendering a light preview on a dark page). No-op for the
+   common case where `.light` is never used. */
+@custom-variant dark (&:where(.dark, .dark *):not(:where(.light, .light *)));
+
+/* Tokens, @utility focus-ring and the x-cloak rule. */
+@import "./cotton-ui.css";
+
+/* Scan the kit's own component templates (tracked in this repo, so Tailwind sees them). */
+@source "../../django_cotton_ui/templates";
+
+/* Also scan the component JS: some variant/state classes live in the Alpine :class
+   logic. Release-build only, consumers link the precompiled CSS and never build the kit. */
+@source "../js";

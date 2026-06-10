@@ -7,7 +7,7 @@
 />
 
 <fieldset
-    x-data='checkbox("{{ name }}", {{ values|json_encode }})'
+    x-data='checkbox("{{ name }}", {{ values|json_dumps }})'
     role="group"
     data-variant="{{ variant }}"
     {% if variant == 'default' %}

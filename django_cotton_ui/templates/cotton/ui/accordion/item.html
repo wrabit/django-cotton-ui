@@ -1,6 +1,6 @@
 <c-vars header="" icon_closed="" icon_open="" icon_position="trailing" :expanded="False" :disabled="False" :accent="True" />
 
-<div x-data="accordionItem({{ expanded|json_encode }}, {{ disabled|json_encode }})" x-bind="root" {{ attrs.dict|merge:'class:w-full' }}>
+<div x-data="accordionItem({{ expanded|json_dumps }}, {{ disabled|json_dumps }})" x-bind="root" {{ attrs.dict|merge:'class:w-full' }}>
     {% if header %}
     <button class="flex flex-1 text-left items-center {% if icon_position == 'leading' %}gap-2{% else %}justify-between{% endif %} py-4 font-medium transition-all w-full rounded-control focus-ring {% if disabled %}opacity-50 cursor-not-allowed{% endif %}"
         x-bind="trigger">

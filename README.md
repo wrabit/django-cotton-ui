@@ -22,15 +22,19 @@ INSTALLED_APPS = [
 ]
 ```
 
-Then wire up Tailwind v4 (scan the component templates, import the theme) and the
-Alpine bundle. See the [installation guide](https://django-cotton.com/ui/installation)
-for the full setup.
+Then `<link>` the kit's precompiled stylesheet and load the Alpine bundle in your base
+template, no build step is required to use the components, and you re-theme by overriding
+the CSS-variable tokens in any stylesheet. A Tailwind v4 build is only needed if your own
+pages use Tailwind utility classes (the usual reason any project runs Tailwind); the kit
+itself never needs one. If you do run a build, set `@custom-variant dark (&:where(.dark, .dark *))`
+so its dark mode matches the kit's (class-based). See the
+[installation guide](https://django-cotton.com/ui/installation) for the full setup.
 
 ## Usage
 
 Components use the `c-ui.` prefix:
 
-```django
+```html
 <c-ui.button variant="primary">Save</c-ui.button>
 <c-ui.input name="email" label="Email" placeholder="you@example.com" />
 
@@ -45,8 +49,12 @@ Browse the full set with live examples in the [component docs](https://django-co
 ## Requirements
 
 - Python ≥ 3.8 · Django ≥ 4.2 · django-cotton ≥ 2.5
-- Tailwind CSS **v4** with a build step (the same setup any Tailwind project uses; the Play CDN and v3 won't work, as the kit's styles are compiled from your `@source`-scanned templates)
+- A precompiled stylesheet ships with the package: just `<link>` it, no build step needed to use the components, and theming is done by overriding the CSS-variable tokens in any stylesheet. Tailwind CSS **v4** is optional, only if your own pages use Tailwind utility classes.
 - Alpine.js v3
+
+## Roadmap
+
+- **CDN** — a CDN-hosted stylesheet + bundle for quick prototyping and zero-setup trials.
 
 ## License
 
