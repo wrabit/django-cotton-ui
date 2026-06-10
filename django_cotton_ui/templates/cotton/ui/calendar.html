@@ -32,7 +32,7 @@ both the datepicker and a bare calendar serialise consistently.
     class
     required="false" />
 
-<div x-data='calendar({{ selected|json_encode }}, "{{ mode }}", {{ disabled|json_encode }} , {{ min|json_encode }}, {{ max|json_encode }}, {{ required|json_encode }}, {{ min_date|json_encode }}, {{ max_date|json_encode }}, {{ disabled_days|json_encode }}, {{ disabled_dates|json_encode }}, {{ value_format|json_encode }})'
+<div x-data='calendar({{ selected|json_dumps }}, "{{ mode }}", {{ disabled|json_dumps }} , {{ min|json_dumps }}, {{ max|json_dumps }}, {{ required|json_dumps }}, {{ min_date|json_dumps }}, {{ max_date|json_dumps }}, {{ disabled_days|json_dumps }}, {{ disabled_dates|json_dumps }}, {{ value_format|json_dumps }})'
     x-bind="root"
     {{ attrs }}
     x-modelable="modeHandler.value"

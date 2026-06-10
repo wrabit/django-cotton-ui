@@ -7,7 +7,7 @@
 />
 
 <fieldset
-    x-data='radio("{{ name }}", {{ value|json_encode }})'
+    x-data='radio("{{ name }}", {{ value|json_dumps }})'
     role="radiogroup"
     data-variant="{{ variant }}"
     {% if variant == 'default' %}

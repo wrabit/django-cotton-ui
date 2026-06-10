@@ -30,7 +30,7 @@
 <div
     x-ref="datePickerInput"
     x-modelable="value"
-    x-data='datePicker({{ open|json_encode }}, {{ value|json_encode }}, {{ mode|json_encode }}, {{ format|json_encode }}, {{ value_format|json_encode }}, {{ locale|json_encode }}, {{ close_on_complete|json_encode }}, {{ trap|json_encode }})'
+    x-data='datePicker({{ open|json_dumps }}, {{ value|json_dumps }}, {{ mode|json_dumps }}, {{ format|json_dumps }}, {{ value_format|json_dumps }}, {{ locale|json_dumps }}, {{ close_on_complete|json_dumps }}, {{ trap|json_dumps }})'
     x-bind="root"
     @change="onCalendarChange($event.detail)"
     {{ attrs.dict|merge:'class:relative' }}>

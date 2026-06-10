@@ -1,6 +1,7 @@
 <c-vars
     :value="0"
     color="accent"
+    :accent="True"
     bar_class=""
     size="md"
     :show_value="False"
@@ -34,7 +35,7 @@
         class="flex-1 {{ size_classes|get_item:size }} bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden"
     >
         <div
-            class="h-full rounded-full transition-[width] duration-500 ease-out {% if bar_class %}{{ bar_class }}{% else %}{{ color_classes|get_item:color }}{% endif %}"
+            class="h-full rounded-full transition-[width] duration-500 ease-out {% if bar_class %}{{ bar_class }}{% elif not accent %}bg-[var(--color-muted,currentColor)]{% else %}{{ color_classes|get_item:color }}{% endif %}"
             style="width: {{ value }}%"
         ></div>
     </div>
