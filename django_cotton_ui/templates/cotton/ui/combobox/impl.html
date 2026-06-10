@@ -33,8 +33,8 @@
         disabled: {{ disabled|lower }}
      })"
      x-init="
-        initSelected('{{ selected|json_dumps }}');
-        initOptions('{{ options|json_dumps }}');
+        initSelected('{{ selected|json_dumps_uri }}');
+        initOptions('{{ options|json_dumps_uri }}');
      "
      class="relative w-full group"
      {{ attrs }}

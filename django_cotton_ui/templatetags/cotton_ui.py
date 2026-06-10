@@ -10,15 +10,16 @@ register = template.Library()
 
 @register.filter
 def json_dumps(value):
-    """
-    Serialize value to JSON and URL-encode for safe embedding in HTML attributes.
+    """JSON-serialize for a bare JS literal in an x-data expression, e.g.
+    x-data='radio("{{ name }}", {{ value|json_dumps }})'. Django auto-escapes the
+    quotes and the browser decodes them, so the literal stays valid (and safe)."""
+    return json.dumps(value)
 
-    Used by components like combobox that need to pass Python data structures
-    to Alpine.js via HTML attributes.
 
-    Usage:
-        {{ my_list|json_dumps }}
-    """
+@register.filter
+def json_dumps_uri(value):
+    """JSON + URL-encode, for values passed as a quoted string and read back with
+    decodeURIComponent (combobox). Use json_dumps for bare x-data literals."""
     return quote(json.dumps(value))
 
 
