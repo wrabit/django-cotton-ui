@@ -44,7 +44,7 @@ Components use the `c-ui.` prefix:
 </c-ui.card>
 ```
 
-Browse the full set with live examples in the [component docs](https://django-cotton.com/ui).
+Browse the full set with live examples in the [ui docs](https://django-cotton.com/ui).
 
 ## Requirements
 
@@ -54,7 +54,7 @@ Browse the full set with live examples in the [component docs](https://django-co
 
 ## Roadmap
 
-- **CDN** — a CDN-hosted stylesheet + bundle for quick prototyping and zero-setup trials.
+- a CDN-hosted stylesheet
 
 ## License
 
