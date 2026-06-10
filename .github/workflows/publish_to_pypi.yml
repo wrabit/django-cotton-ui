@@ -1,0 +1,43 @@
+name: "Publish to PyPI on version bump"
+run-name: "Publish to PyPI (@${{ github.actor }})"
+
+# Publishes when pyproject.toml's version changes on main (direct push or PR merge),
+# but only if that version isn't already on PyPI, so it's safe to re-run and ignores
+# commits that don't bump the version. Manual dispatch is still available.
+# Requires a PYPI_TOKEN repository secret.
+
+on:
+  push:
+    branches: [main]
+    paths: ['pyproject.toml']
+  workflow_dispatch:
+
+jobs:
+  publish_pypi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Read pyproject version
+        id: ver
+        run: echo "version=$(sed -nE 's/^version = \"(.+)\"/\1/p' pyproject.toml | head -1)" >> "$GITHUB_OUTPUT"
+
+      - name: Check PyPI for this version
+        id: check
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/django-cotton-ui/${{ steps.ver.outputs.version }}/json")
+          echo "Version ${{ steps.ver.outputs.version }} -> PyPI returns $status"
+          if [ "$status" = "404" ]; then echo "publish=true" >> "$GITHUB_OUTPUT"; else echo "publish=false" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Set up Python
+        if: steps.check.outputs.publish == 'true'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Build and publish to PyPI
+        if: steps.check.outputs.publish == 'true'
+        uses: JRubics/poetry-publish@v1.17
+        with:
+          pypi_token: ${{ secrets.PYPI_TOKEN }}
