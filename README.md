@@ -1,6 +1,8 @@
-# Django UI Components, woven from Cotton
+# Django UI Components, Woven from Cotton
 
 An optional kit of accessible, themeable UI components for [Django Cotton](https://github.com/wrabit/django-cotton), built with Tailwind CSS v4 and Alpine.js.
+
+**Since we're < v1, it's possible some breaking changes could be make but best effort will be made for backwards compatibility**
 
 ### Docs: **[django-cotton.com/ui](https://django-cotton.com/ui)**
 
@@ -13,8 +15,6 @@ An optional kit of accessible, themeable UI components for [Django Cotton](https
 - Add a llms.txt
 - More components
 - Polish mobile experience
-
-**Since we're < v1, it's possible some breaking changes could be make but best effort will be made for backwards compatibility**
 
 ## License
 
