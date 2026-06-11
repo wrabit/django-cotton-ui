@@ -36,7 +36,7 @@ both the datepicker and a bare calendar serialise consistently.
     x-bind="root"
     {{ attrs }}
     x-modelable="modeHandler.value"
-    class="p-3 bg-white dark:bg-zinc-800 border border-[color:var(--color-box-border)] rounded-box shadow-sm {% if full %}w-full{% else %}w-[280px]{% endif %} {{ class }}">
+    class="p-3 bg-white dark:bg-zinc-800 border border-[color:var(--color-box-border)] rounded-control shadow-sm {% if full %}w-full{% else %}w-[280px]{% endif %} {{ class }}">
     <div class="flex items-center justify-between mb-4">
         <button type="button" @click="headerPrev()" aria-label="Previous"
             class="inline-flex items-center justify-center w-7 h-7 rounded-control hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors focus-ring">

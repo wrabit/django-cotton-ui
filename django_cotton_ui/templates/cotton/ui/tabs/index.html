@@ -3,6 +3,7 @@
     variant="default"
     size="md"
     :accent="True"
+    :fill="False"
 />
 
 <div x-data="{
@@ -36,6 +37,7 @@ class="w-full space-y-4"
                 @click="activeTab = tab.name"
                 class="
                     inline-flex items-center justify-center whitespace-nowrap transition-all focus-ring
+                    {% if fill %}flex-1{% endif %}
                     disabled:pointer-events-none disabled:opacity-50
                     {% if size == 'sm' %}text-xs px-2.5 py-1
                     {% elif size == 'lg' %}text-base px-4 py-2

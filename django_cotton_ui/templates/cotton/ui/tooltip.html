@@ -197,7 +197,7 @@
             x-transition:leave-end="opacity-0 scale-95"
             x-ref="tooltip"
             role="tooltip"
-            class="absolute z-50 w-max max-w-xs rounded-control bg-zinc-900 dark:bg-zinc-700 {{ size_classes|get_item:size }} font-medium text-white shadow-lg pointer-events-none"
+            class="absolute z-[100] w-max max-w-xs rounded-control bg-zinc-900 dark:bg-zinc-700 {{ size_classes|get_item:size }} font-medium text-white shadow-lg pointer-events-none"
             :style="`left: ${tooltipPosition.x}px; top: ${tooltipPosition.y}px;`"
         >
             {{ content }}

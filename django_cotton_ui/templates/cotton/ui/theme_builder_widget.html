@@ -1,0 +1,435 @@
+<c-vars
+    position="bottom-right"
+    :open="False"
+    :persist="True"
+    storage_key="cotton-ui:theme-builder"
+    select_class="appearance-none cursor-pointer text-xs rounded-control border border-zinc-200 dark:border-zinc-700 bg-[var(--color-input-bg)] text-zinc-700 dark:text-zinc-200 py-1 pl-2.5 pr-7 focus-ring"
+    :accent_list="['red','orange','amber','yellow','lime','green','emerald','teal','cyan','sky','blue','indigo','violet','purple','fuchsia','pink','rose']"
+    :gray_list="['zinc','slate','gray','neutral','stone','taupe','mauve','mist','olive']"
+    :position_classes="{
+        'bottom-right': 'bottom-4 right-4 items-end',
+        'bottom-left': 'bottom-4 left-4 items-start',
+        'top-right': 'top-4 right-4 items-end',
+        'top-left': 'top-4 left-4 items-start'
+    }"
+    class
+/>
+
+{% comment %}
+<c-ui.theme-builder-widget> — a live theming devtool. Drop it once (e.g. before </body> in
+your base layout) and it floats a compact launcher in a corner. Open it to tweak the
+kit's theme tokens and the whole page re-themes in place — the live site is the preview,
+so there's no built-in specimen. Copy the generated :root { } + .dark { } override block
+into your own CSS to make a theme permanent.
+
+Tokens are written to <html>, so the page stays fully visible, scrollable and interactive
+while you adjust (no modal, no backdrop, no scroll-lock). Per-mode values (accent, surface
+lift) follow the site's own dark class and re-apply when an appearance toggle flips it.
+
+By default the working theme is saved to localStorage so it survives navigation and reloads
+(it's a preview aid, not a substitute for the exported CSS). Reset restores the kit defaults.
+
+  position — bottom-right (default), bottom-left, top-right, top-left.
+  :open — start expanded.
+  :persist — save the working theme to localStorage (default True).
+  storage_key — localStorage key; namespace it per app/env when scaling
+    (default "cotton-ui:theme-builder", holding a versioned JSON blob).
+{% endcomment %}
+
+<div
+    {{ attrs }}
+    x-data="cottonThemeBuilderWidget({ open: {{ open|lower }}, persist: {{ persist|lower }}, storageKey: '{{ storage_key }}' })"
+    x-cloak
+    class="fixed z-[90] flex flex-col {{ position_classes|get_item:position }} {{ class }}">
+
+    {# ---- Launcher (collapsed): paintbrush FAB; a 'reset' link appears to its left while a theme override is active ---- #}
+    <div x-show="!panelOpen" class="flex items-center gap-2">
+        <button type="button" x-show="isModified" x-cloak @click="reset()"
+            class="cursor-pointer text-xs font-medium px-2 py-1 rounded-control bg-white/90 dark:bg-zinc-800/90 backdrop-blur border border-zinc-200 dark:border-zinc-700 text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white shadow-sm transition-colors">reset</button>
+        <button type="button" @click="panelOpen = true"
+            class="cursor-pointer inline-flex items-center justify-center size-11 rounded-full border shadow-lg transition-colors focus-ring"
+            :class="isModified ? 'bg-accent text-accent-foreground border-transparent hover:bg-accent-content' : 'bg-[var(--color-surface)] text-accent border-accent hover:bg-accent/10'"
+            aria-label="Open theme builder">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" /></svg>
+        </button>
+    </div>
+
+    {% comment %}Palette priming: forces the build to emit a --color-*-* var for every accent and gray
+       shade the controls remap to live (the kit otherwise only emits the zinc scale it uses).
+       Tailwind scans this literal class list at build time; the element never renders.{% endcomment %}
+    <div hidden aria-hidden="true" class="bg-red-300 bg-red-400 bg-red-500 bg-red-600 bg-red-950 bg-orange-300 bg-orange-400 bg-orange-500 bg-orange-600 bg-orange-950 bg-amber-300 bg-amber-400 bg-amber-500 bg-amber-600 bg-amber-950 bg-yellow-300 bg-yellow-400 bg-yellow-500 bg-yellow-600 bg-yellow-950 bg-lime-300 bg-lime-400 bg-lime-500 bg-lime-600 bg-lime-950 bg-green-300 bg-green-400 bg-green-500 bg-green-600 bg-green-950 bg-emerald-300 bg-emerald-400 bg-emerald-500 bg-emerald-600 bg-emerald-950 bg-teal-300 bg-teal-400 bg-teal-500 bg-teal-600 bg-teal-950 bg-cyan-300 bg-cyan-400 bg-cyan-500 bg-cyan-600 bg-cyan-950 bg-sky-300 bg-sky-400 bg-sky-500 bg-sky-600 bg-sky-950 bg-blue-300 bg-blue-400 bg-blue-500 bg-blue-600 bg-blue-950 bg-indigo-300 bg-indigo-400 bg-indigo-500 bg-indigo-600 bg-indigo-950 bg-violet-300 bg-violet-400 bg-violet-500 bg-violet-600 bg-violet-950 bg-purple-300 bg-purple-400 bg-purple-500 bg-purple-600 bg-purple-950 bg-fuchsia-300 bg-fuchsia-400 bg-fuchsia-500 bg-fuchsia-600 bg-fuchsia-950 bg-pink-300 bg-pink-400 bg-pink-500 bg-pink-600 bg-pink-950 bg-rose-300 bg-rose-400 bg-rose-500 bg-rose-600 bg-rose-950 bg-slate-50 bg-slate-100 bg-slate-200 bg-slate-300 bg-slate-400 bg-slate-500 bg-slate-600 bg-slate-700 bg-slate-800 bg-slate-900 bg-slate-950 bg-gray-50 bg-gray-100 bg-gray-200 bg-gray-300 bg-gray-400 bg-gray-500 bg-gray-600 bg-gray-700 bg-gray-800 bg-gray-900 bg-gray-950 bg-neutral-50 bg-neutral-100 bg-neutral-200 bg-neutral-300 bg-neutral-400 bg-neutral-500 bg-neutral-600 bg-neutral-700 bg-neutral-800 bg-neutral-900 bg-neutral-950 bg-stone-50 bg-stone-100 bg-stone-200 bg-stone-300 bg-stone-400 bg-stone-500 bg-stone-600 bg-stone-700 bg-stone-800 bg-stone-900 bg-stone-950 bg-taupe-50 bg-taupe-100 bg-taupe-200 bg-taupe-300 bg-taupe-400 bg-taupe-500 bg-taupe-600 bg-taupe-700 bg-taupe-800 bg-taupe-900 bg-taupe-950 bg-mauve-50 bg-mauve-100 bg-mauve-200 bg-mauve-300 bg-mauve-400 bg-mauve-500 bg-mauve-600 bg-mauve-700 bg-mauve-800 bg-mauve-900 bg-mauve-950 bg-mist-50 bg-mist-100 bg-mist-200 bg-mist-300 bg-mist-400 bg-mist-500 bg-mist-600 bg-mist-700 bg-mist-800 bg-mist-900 bg-mist-950 bg-olive-50 bg-olive-100 bg-olive-200 bg-olive-300 bg-olive-400 bg-olive-500 bg-olive-600 bg-olive-700 bg-olive-800 bg-olive-900 bg-olive-950"></div>
+
+    {# ---- Card (expanded) ---- #}
+    <div x-show="panelOpen" x-cloak
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 translate-y-2"
+        class="w-[340px] max-w-[calc(100vw-2rem)] max-h-[82vh] flex flex-col rounded-box border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl overflow-hidden">
+
+        {# Header #}
+        <div class="flex items-center justify-between gap-2 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
+            <div class="flex items-center gap-2 min-w-0">
+                <span class="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Theme</span>
+                <span class="text-[11px] px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500" x-text="isDark ? 'dark' : 'light'"></span>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+                <button type="button" @click="reset()" class="cursor-pointer text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 px-1.5 py-1 rounded-control transition-colors">Reset</button>
+                <button type="button" @click="panelOpen = false" class="cursor-pointer rounded-control p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus-ring" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+        </div>
+
+        {# Scrolling control body #}
+        <div class="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+
+            {% comment %}Accent. Swatches are server-rendered (Django loop) so each can carry the kit's
+               own xs tooltip with the colour name; Alpine still drives click + active ring.{% endcomment %}
+            <div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">Accent</div>
+                <div class="flex flex-wrap gap-1.5">
+                    {% for c in accent_list %}
+                    <c-ui.tooltip size="xs">
+                        <c-slot name="content">{{ c|capfirst }}</c-slot>
+                        <button type="button" @click="setAccent('{{ c }}')"
+                            class="block size-6 rounded-full ring-1 ring-black/10 dark:ring-white/15 cursor-pointer transition-transform hover:scale-110"
+                            :class="accent === '{{ c }}' ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-900 !ring-zinc-900 dark:!ring-white' : ''"
+                            style="background-color: var(--color-{{ c }}-500)"></button>
+                    </c-ui.tooltip>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Gray base — remaps the zinc scale the kit is built on. #}
+            <div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">Gray</div>
+                <div class="flex flex-wrap gap-1.5">
+                    {% for c in gray_list %}
+                    <c-ui.tooltip size="xs">
+                        <c-slot name="content">{{ c|capfirst }}</c-slot>
+                        <button type="button" @click="setGray('{{ c }}')"
+                            class="block size-6 rounded-full ring-1 ring-black/10 dark:ring-white/15 cursor-pointer transition-transform hover:scale-110"
+                            :class="gray === '{{ c }}' ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-900 !ring-zinc-900 dark:!ring-white' : ''"
+                            style="background-color: var(--color-{{ c }}-400)"></button>
+                    </c-ui.tooltip>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% comment %}Form controls / Structural via the kit's own Tabs (fill = equal-width nav).
+               Multi-option tokens use compact right-aligned native selects: @change writes the value
+               and re-themes; :selected reflects state (avoids the x-model + x-for-options init race
+               that would otherwise pin the select to its first option).{% endcomment %}
+            <c-ui.tabs fill size="sm" default_tab="Form controls">
+                <c-ui.tabs.tab name="Form controls">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Radius</span>
+                            <div class="relative">
+                                <select @change="radius = $event.target.value; apply()" class="{{ select_class }}">
+                                    <template x-for="r in radii" :key="r[0]"><option :value="r[1]" :selected="radius === r[1]" x-text="r[0]"></option></template>
+                                </select>
+                                <svg class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 size-3 text-zinc-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Button radius</span>
+                            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-zinc-500 dark:text-zinc-400 select-none">
+                                Full (pill)
+                                <input type="checkbox"
+                                    :checked="buttonRadius === 'full'"
+                                    @change="buttonRadius = $event.target.checked ? 'full' : 'default'; apply()"
+                                    class="size-3.5 cursor-pointer accent-[var(--color-accent)]" />
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Shadow</span>
+                            <div class="relative">
+                                <select @change="inputShadow = $event.target.value; apply()" class="{{ select_class }}">
+                                    <template x-for="s in shadows" :key="s[0]"><option :value="s[1]" :selected="inputShadow === s[1]" x-text="s[0]"></option></template>
+                                </select>
+                                <svg class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 size-3 text-zinc-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Focus ring</span>
+                            <div class="relative">
+                                <select @change="focusRing = $event.target.value; apply()" class="{{ select_class }}">
+                                    <template x-for="r in rings" :key="r[0]"><option :value="r[1]" :selected="focusRing === r[1]" x-text="r[0]"></option></template>
+                                </select>
+                                <svg class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 size-3 text-zinc-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                            </div>
+                        </div>
+                    </div>
+                </c-ui.tabs.tab>
+
+                <c-ui.tabs.tab name="Structural">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Radius</span>
+                            <div class="relative">
+                                <select @change="radiusBox = $event.target.value; apply()" class="{{ select_class }}">
+                                    <template x-for="r in radii" :key="r[0]"><option :value="r[1]" :selected="radiusBox === r[1]" x-text="r[0]"></option></template>
+                                </select>
+                                <svg class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 size-3 text-zinc-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Shadow</span>
+                            <div class="relative">
+                                <select @change="boxShadow = $event.target.value; apply()" class="{{ select_class }}">
+                                    <template x-for="s in shadows" :key="s[0]"><option :value="s[1]" :selected="boxShadow === s[1]" x-text="s[0]"></option></template>
+                                </select>
+                                <svg class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 size-3 text-zinc-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Card border</span>
+                            <div class="inline-flex rounded-control border border-zinc-200 dark:border-zinc-700 bg-[var(--color-input-bg)] p-0.5">
+                                <button type="button" @click="setBorders(true)"
+                                    class="px-2 py-0.5 text-[11px] rounded-[calc(var(--radius-control)*0.5)] cursor-pointer transition-colors"
+                                    :class="borders ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'">On</button>
+                                <button type="button" @click="setBorders(false)"
+                                    class="px-2 py-0.5 text-[11px] rounded-[calc(var(--radius-control)*0.5)] cursor-pointer transition-colors"
+                                    :class="!borders ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'">Off</button>
+                            </div>
+                        </div>
+
+                        {# Surface lift is the one token set per-mode, so light and dark each get a slider. #}
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400 shrink-0">
+                                Light mode surface (<span class="text-zinc-400" x-text="surfaceLight"></span>%)
+                            </span>
+                            <input type="range" min="0" max="100" step="1"
+                                :value="surfaceLight"
+                                @input="surfaceLight = +$event.target.value; apply()"
+                                :style="`--range-fill: ${surfaceLight}%`"
+                                class="ui-range max-w-[7.5rem]" />
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400 shrink-0">
+                                Dark mode surface (<span class="text-zinc-400" x-text="surfaceDark"></span>%)
+                            </span>
+                            <input type="range" min="0" max="100" step="1"
+                                :value="surfaceDark"
+                                @input="surfaceDark = +$event.target.value; apply()"
+                                :style="`--range-fill: ${surfaceDark}%`"
+                                class="ui-range max-w-[7.5rem]" />
+                        </div>
+                    </div>
+                </c-ui.tabs.tab>
+            </c-ui.tabs>
+        </div>
+
+        {# ---- CSS override: compact, collapsible, with copy ---- #}
+        <div class="shrink-0 border-t border-zinc-200 dark:border-zinc-800">
+            <div class="flex items-center justify-between gap-2 px-4 py-2.5">
+                <button type="button" @click="showCss = !showCss"
+                    class="cursor-pointer inline-flex items-center gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-3.5 transition-transform" :class="showCss ? 'rotate-90' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+                    Override CSS
+                </button>
+                <button type="button" @click="copy()"
+                    class="cursor-pointer inline-flex items-center gap-1 px-2 py-1 rounded-control bg-accent text-accent-foreground text-xs font-medium hover:bg-accent-content transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" /></svg>
+                    <span x-text="copied ? 'Copied!' : 'Copy CSS'"></span>
+                </button>
+            </div>
+            <div x-show="showCss" x-collapse x-cloak class="px-4 pb-3">
+                <pre class="rounded-control bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-[11px] leading-[1.45] p-3 max-h-44 overflow-auto"><code class="!bg-transparent !p-0" x-html="highlightedCss"></code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('cottonThemeBuilderWidget', (opts = {}) => ({
+            shades: [50,100,200,300,400,500,600,700,800,900,950],
+            radii: [['none','0'],['sm','0.25rem'],['md','0.375rem'],['lg','0.5rem'],['xl','0.75rem'],['2xl','1rem']],
+            shadows: [['none','none'],['sm','0 1px 2px 0 rgb(0 0 0 / 0.05)'],['md','0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'],['lg','0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)']],
+            rings: [['0','0px'],['1','1px'],['2','2px'],['4','4px']],
+
+            // Defaults mirror the kit's shipped tokens, so an untouched panel emits the stock theme.
+            defaults: { accent: 'teal', gray: 'zinc', radius: '0.375rem', buttonRadius: 'default', radiusBox: '0.5rem', focusRing: '2px', inputShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)', borders: true, surfaceLight: 100, surfaceDark: 8 },
+
+            accent: 'teal',
+            gray: 'zinc',
+            radius: '0.375rem',
+            buttonRadius: 'default',  // 'default' inherits --radius-control; 'full' = pill
+            radiusBox: '0.5rem',
+            focusRing: '2px',
+            inputShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+            boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+            borders: true,
+            surfaceLight: 100,  /* --surface-level per mode: how much lighter surfaces are than the page */
+            surfaceDark: 8,
+
+            isDark: false,
+            panelOpen: false,
+            showCss: false,
+            copied: false,
+            _observer: null,
+
+            // Persistence: one namespaced, versioned JSON blob so the working theme survives
+            // navigation. storageKey is overridable per app/env; bump persistVersion if the
+            // saved shape changes (older blobs are then ignored, falling back to defaults).
+            persist: opts.persist !== false,
+            storageKey: opts.storageKey || 'cotton-ui:theme-builder',
+            persistVersion: 1,
+            persistedKeys: ['accent', 'gray', 'radius', 'buttonRadius', 'radiusBox', 'focusRing', 'inputShadow', 'boxShadow', 'borders', 'surfaceLight', 'surfaceDark', 'panelOpen'],
+
+            init() {
+                this.panelOpen = !!opts.open;
+                this.isDark = document.documentElement.classList.contains('dark');
+                if (this.persist) {
+                    this.load();  // may restore panelOpen + tokens from a previous page
+                    // Open/close is toggled directly (not via apply), so persist it on change.
+                    this.$watch('panelOpen', () => this.save());
+                }
+                // Re-apply when the site's appearance toggle flips the <html> class.
+                this._observer = new MutationObserver(() => {
+                    const dark = document.documentElement.classList.contains('dark');
+                    if (dark !== this.isDark) { this.isDark = dark; this.apply(); }
+                });
+                this._observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                this.apply();
+            },
+
+            destroy() { if (this._observer) this._observer.disconnect(); },
+
+            // Vars are written to <html> so the whole page re-themes; saved to localStorage (when
+            // persist is on) at the end so the theme carries across navigation.
+            apply() {
+                const el = document.documentElement;
+                if (this.isDark) {
+                    el.style.setProperty('--color-accent', 'var(--color-' + this.accent + '-400)');
+                    el.style.setProperty('--color-accent-content', 'var(--color-' + this.accent + '-300)');
+                    el.style.setProperty('--color-accent-foreground', 'var(--color-' + this.accent + '-950)');
+                } else {
+                    el.style.setProperty('--color-accent', 'var(--color-' + this.accent + '-500)');
+                    el.style.setProperty('--color-accent-content', 'var(--color-' + this.accent + '-600)');
+                    el.style.setProperty('--color-accent-foreground', '#ffffff');
+                }
+                // Gray base: remap the zinc scale the kit is built on to the chosen gray, and drive
+                // --color-bg so the page (and the derived surface below) follows. For zinc we clear the
+                // overrides so the kit's own defaults stand. Runs before surface + card-border, which
+                // read --color-bg / --color-zinc-*.
+                this.shades.forEach((s) => el.style.removeProperty('--color-zinc-' + s));
+                if (this.gray !== 'zinc') {
+                    const g = (n) => 'var(--color-' + this.gray + '-' + n + ')';
+                    this.shades.forEach((s) => el.style.setProperty('--color-zinc-' + s, g(s)));
+                    el.style.setProperty('--color-bg', this.isDark ? g(900) : g(50));
+                } else {
+                    el.style.removeProperty('--color-bg');
+                }
+                // Surface elevation: set --color-surface to the computed mix directly so the preview is
+                // correct even where the kit's --surface-level derivation isn't in the served CSS. The
+                // copied snippet uses the clean --surface-level token, which the kit derives.
+                const level = this.isDark ? this.surfaceDark : this.surfaceLight;
+                el.style.setProperty('--color-surface', 'color-mix(in oklab, var(--color-bg), white ' + level + '%)');
+
+                el.style.setProperty('--radius-control', this.radius);
+                el.style.setProperty('--radius-box', this.radiusBox);
+                // Button radius: 'default' tracks the control radius; 'full' makes pill buttons.
+                el.style.setProperty('--radius-button', this.buttonRadius === 'full' ? 'calc(infinity * 1px)' : 'var(--radius-control)');
+                el.style.setProperty('--focus-ring-width', this.focusRing);
+                el.style.setProperty('--shadow-input', this.inputShadow);
+                el.style.setProperty('--shadow-box', this.boxShadow);
+                // Box-role border (cards): On → restore the gray (mode-aware) so it wins over a
+                // shadow-only default; Off → transparent. removeProperty can't beat the stylesheet.
+                el.style.setProperty('--color-card-border', this.borders ? (this.isDark ? 'var(--color-zinc-700)' : 'var(--color-zinc-200)') : 'transparent');
+
+                this.save();
+            },
+
+            load() {
+                try {
+                    const raw = localStorage.getItem(this.storageKey);
+                    if (!raw) return;
+                    const data = JSON.parse(raw);
+                    if (!data || data.v !== this.persistVersion) return;  // ignore an incompatible/old blob
+                    this.persistedKeys.forEach((k) => { if (k in data) this[k] = data[k]; });
+                } catch (e) { /* storage unavailable / malformed — fall back to defaults */ }
+            },
+
+            save() {
+                if (!this.persist) return;
+                try {
+                    const data = { v: this.persistVersion };
+                    this.persistedKeys.forEach((k) => { data[k] = this[k]; });
+                    localStorage.setItem(this.storageKey, JSON.stringify(data));
+                } catch (e) { /* storage unavailable / quota — preview still works in-page */ }
+            },
+
+            setAccent(a) { this.accent = a; this.apply(); },
+            setGray(g) { this.gray = g; this.apply(); },
+            setBorders(v) { this.borders = v; this.apply(); },
+
+            reset() { Object.assign(this, this.defaults); this.apply(); },
+
+            // True when any token differs from the kit defaults — drives the collapsed 'reset' link.
+            get isModified() { return Object.keys(this.defaults).some((k) => this[k] !== this.defaults[k]); },
+
+            get css() {
+                // Gray base remaps Tailwind's zinc palette, which only a build can regenerate, so it
+                // goes in @theme (needs the consumer's own Tailwind build). Accent + component tokens
+                // use :root / .dark, which work on the no-build <link> path too.
+                const grayBlock = this.gray === 'zinc' ? '' :
+                    '\n\n@theme {\n' +
+                    '    /* Gray base: remap zinc to ' + this.gray + ' (the kit is built on the zinc scale; needs your own Tailwind build) */\n' +
+                    this.shades.map((s) => '    --color-zinc-' + s + ': var(--color-' + this.gray + '-' + s + ');').join('\n') +
+                    '\n}';
+                return ':root {\n' +
+                    '    /* Accent: primary buttons, links, focus ring, active states */\n' +
+                    '    --color-accent: var(--color-' + this.accent + '-500);\n' +
+                    '    --color-accent-content: var(--color-' + this.accent + '-600);\n' +
+                    '    --color-accent-foreground: var(--color-white);\n\n' +
+                    '    /* Corner radius, by role */\n' +
+                    '    --radius-control: ' + this.radius + ';\n' +
+                    '    --radius-box: ' + this.radiusBox + ';\n' +
+                    (this.buttonRadius === 'full' ? '    --radius-button: calc(infinity * 1px);  /* pill buttons (defaults to --radius-control) */\n' : '') +
+                    '\n' +
+                    '    /* Form controls */\n' +
+                    '    --focus-ring-width: ' + this.focusRing + ';\n' +
+                    '    --shadow-input: ' + this.inputShadow + ';\n\n' +
+                    '    /* Structural surfaces */\n' +
+                    '    --shadow-box: ' + this.boxShadow + ';\n' +
+                    (this.surfaceLight !== 100 ? '    --surface-level: ' + this.surfaceLight + '%;\n' : '') +
+                    (this.borders ? '' : '    --color-card-border: transparent;\n') +
+                    '}\n\n' +
+                    '.dark {\n' +
+                    '    /* Dark mode: lighter accent so it stays vivid on dark surfaces */\n' +
+                    '    --color-accent: var(--color-' + this.accent + '-400);\n' +
+                    '    --color-accent-content: var(--color-' + this.accent + '-300);\n' +
+                    '    --color-accent-foreground: var(--color-' + this.accent + '-950);\n' +
+                    (this.surfaceDark !== 8 ? '    --surface-level: ' + this.surfaceDark + '%;\n' : '') +
+                    '}' + grayBlock;
+            },
+
+            // Syntax-highlight reactively when highlight.js is present; x-html so the spans survive.
+            get highlightedCss() {
+                const code = this.css;
+                if (window.hljs && hljs.getLanguage && hljs.getLanguage('css')) {
+                    try { return hljs.highlight(code, { language: 'css' }).value; } catch (e) { /* fall through */ }
+                }
+                return code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            },
+
+            copy() {
+                navigator.clipboard.writeText(this.css);
+                this.copied = true;
+                setTimeout(() => { this.copied = false; }, 1500);
+            },
+        }));
+    });
+</script>

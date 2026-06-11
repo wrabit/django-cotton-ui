@@ -40,7 +40,7 @@ Renders a <button> by default, or an <a> styled as a button when `href` is set
     href="{{ href }}"
     class="
     {% if outlined %}{{ outlined_variants|get_item:variant }}{% else %}{{ variants|get_item:variant }}{% endif %}
-    inline-block no-underline cursor-pointer whitespace-nowrap rounded-control
+    inline-block no-underline cursor-pointer whitespace-nowrap rounded-button
     {{ size_classes|get_item:size }}
     {% if variant == 'text' %}!px-0{% endif %}
     font-medium transition text-center
@@ -52,7 +52,7 @@ Renders a <button> by default, or an <a> styled as a button when `href` is set
 {% else %}
 <button {{ attrs }} type="button" class="
     {% if outlined %}{{ outlined_variants|get_item:variant }}{% else %}{{ variants|get_item:variant }}{% endif %}
-    cursor-pointer whitespace-nowrap rounded-control
+    cursor-pointer whitespace-nowrap rounded-button
     {{ size_classes|get_item:size }}
     {% if variant == 'text' %}!px-0{% endif %}
     font-medium transition text-center
