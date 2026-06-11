@@ -18,7 +18,12 @@
 @layer theme {
     :root {
         --color-bg: var(--color-zinc-50);       /* page base */
-        --color-surface: #ffffff;               /* raised: cards, dialogs, menus */
+        /* Raised surfaces (cards, dialogs, menus) are derived from the page bg, lifted
+           toward white by --surface-level. Higher = more contrast off the page. Light
+           defaults to 100% (white); .dark uses a subtle lift. Set --color-surface
+           directly to opt out of the derivation. */
+        --surface-level: 100%;
+        --color-surface: color-mix(in oklab, var(--color-bg), white var(--surface-level));
         --color-input-bg: transparent;          /* form fields: border-defined in light; see .dark for the lift */
         --color-box-border: var(--color-zinc-200);  /* border for box-role surfaces (cards, dialogs, menus); set transparent for a shadow-only look. NOT inputs (see --radius-control). */
 
@@ -36,7 +41,7 @@
         --color-accent-content: var(--color-zinc-300);
         --color-accent-foreground: var(--color-zinc-900);
         --color-bg: var(--color-zinc-900);
-        --color-surface: var(--color-zinc-800);
+        --surface-level: 8%;  /* subtle lift off the dark page (~zinc-800) */
         --color-box-border: var(--color-zinc-700);
         /* Inputs lift off any surface (page or card) via a translucent lighten. */
         --color-input-bg: color-mix(in oklab, white 4%, transparent);
@@ -56,6 +61,40 @@
     outline-offset: var(--focus-ring-offset);
     &:focus-visible { outline-color: var(--focus-ring-color); }
 }
+
+/* Range slider, themed to match inputs: a visible filled track and a neutral surface
+   thumb (no bright accent). Webkit and Moz pseudo-elements are separate rules, a browser
+   drops the whole rule if it doesn't recognise the selector. */
+.ui-range {
+    --range-fill-color: var(--color-accent);   /* completed portion + thumb; neutral via .ui-range-neutral */
+    --range-track-bg: var(--color-input-bg);    /* unfilled track: same surface as an input/unchecked checkbox */
+    --range-border: var(--color-zinc-300);      /* track + thumb border, matched to inputs/radio; .dark override below */
+    @apply w-full cursor-pointer appearance-none bg-transparent;
+    &:disabled { @apply cursor-not-allowed opacity-50; }
+
+    /* Track: completed portion (up to --range-fill, set per value) is the accent; the rest
+       is the unchecked-control bg. Separate webkit/moz rules, a browser drops a rule whose
+       selector it doesn't know. Colours come from custom props (set on .ui-range, inherited
+       into the pseudo-element) because Tailwind's `dark:` variant cannot target a nested
+       pseudo-element — it compiles to ::thumb:where(.dark) which never matches. */
+    &::-webkit-slider-runnable-track {
+        @apply h-2 rounded-full border;
+        border-color: var(--range-border);
+        background: linear-gradient(to right, var(--range-fill-color) var(--range-fill, 0%), var(--range-track-bg) var(--range-fill, 0%));
+    }
+    &::-moz-range-track { @apply h-2 rounded-full border; border-color: var(--range-border); background: var(--range-track-bg); }
+    &::-moz-range-progress { @apply h-2; border-radius: 9999px 0 0 9999px; background: var(--range-fill-color); }
+
+    &::-webkit-slider-thumb { @apply appearance-none size-[1.05rem] -mt-[0.3rem] rounded-full border-2 shadow-sm; border-color: var(--range-border); background: var(--range-fill-color); }
+    &::-moz-range-thumb { @apply size-[1.05rem] rounded-full border-2 shadow-sm; border-color: var(--range-border); background: var(--range-fill-color); }
+
+    &:focus-visible { @apply outline-none; }
+    &:focus-visible::-webkit-slider-thumb { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: 2px; }
+    &:focus-visible::-moz-range-thumb { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: 2px; }
+}
+.dark .ui-range { --range-border: var(--color-zinc-700); }
+.ui-range-neutral { --range-fill-color: var(--color-zinc-400); }
+.dark .ui-range-neutral { --range-fill-color: var(--color-zinc-500); }
 
 /* Alpine.js x-cloak */
 [x-cloak] {
