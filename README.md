@@ -8,12 +8,13 @@ An optional kit of accessible, themeable UI components for [Django Cotton](https
 
 ## Install: **[installation guide](https://django-cotton.com/ui/installation)**
 
-## Roadmap
+## Idea pool:
 
-- Publish and document CDN-hosted stylesheet for quick prototyping
+- Add a CDN-hosted stylesheet for quick prototyping
 - Convert all docs to markdown source
 - Add a llms.txt
 - More components
+- Semantic CSS classes to reduce html boilerplate
 - Polish mobile experience
 
 ## License
