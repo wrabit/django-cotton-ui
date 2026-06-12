@@ -1,15 +1,20 @@
 <c-vars
     href="#"
     :current="False"
+    spy=""
     badge=""
     badge_color="zinc"
     badge_variant=""
     class=""
 />
 
+{% comment %}`spy` opts the item into scrollspy: inside a <c-ui.scrollspy>, it smooth-scrolls to
+   the section with that id on click and toggles the `.is-current` marker as the section enters
+   view. `href` defaults to `#<spy>` when not set.{% endcomment %}
 <a
-    href="{{ href }}"
+    href="{% if spy and href == '#' %}#{{ spy }}{% else %}{{ href }}{% endif %}"
     {% if current %}aria-current="page"{% endif %}
+    {% if spy %}@click.prevent="scrollTo('{{ spy }}')" :class="isActive('{{ spy }}') && 'is-current'"{% endif %}
     class="{% if current %}is-current {% endif %}{{ class }}"
     {{ attrs }}
 >

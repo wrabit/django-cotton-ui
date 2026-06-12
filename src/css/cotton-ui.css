@@ -93,7 +93,7 @@
         --color-accent-content: var(--color-zinc-300);
         --color-accent-foreground: var(--color-zinc-900);
         --color-bg: var(--color-zinc-900);
-        --surface-level: 8%;  /* subtle lift off the dark page (~zinc-800) */
+        --surface-level: 6%;  /* subtle lift off the dark page */
         --color-box-border: var(--color-zinc-700);
         /* Inputs lift off any surface (page or card) via a translucent lighten. */
         --color-input-bg: color-mix(in oklab, white 4%, transparent);

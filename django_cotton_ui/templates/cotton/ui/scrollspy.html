@@ -1,48 +1,89 @@
-<c-vars class="" />
+<c-vars root="" class="" />
 
 {% comment %}
-Wrap your nav in this component, mark each page section with `data-spy-section id="..."`,
-then bind link styling to `isActive('id')`. An IntersectionObserver tracks which section
-is in view and exposes `active` (the current id) on the Alpine component.
+Wrap JUST your nav in this component and bind link styling to `isActive('id')`. The ids it tracks
+are read from the nav's own links (their `#…` hrefs — `spy` items and manual links alike), so your
+sections only need a matching `id`, anywhere in your layout. The scroll container is detected
+automatically (the sections' nearest scrolling ancestor, else the page), so there's nothing else to
+mark. An optional `data-spy-section` lets you track a section that has no link.
 
-By default it watches the viewport (page scroll). If you nest the sections inside an element
-marked `data-spy-root` (a fixed-height, overflow-scrolling container), that container is used
-as the observer root instead, for a self-contained scroll area. The data factory is registered
-once and guarded so multiple includes never double-register.
+`root` is an optional CSS-selector escape hatch for the cases auto-detection can't resolve (sections
+spread across containers, a false-positive overflow ancestor, content that scrolls only after load):
+point it at the scrolling element to use, e.g. `root="#docs-panel"`.
+
+The active id is computed from scroll position and exposed as `active` on the Alpine component.
+Several scrollspies can share a page with no extra wiring — each tracks only its own links. The data
+factory is registered once and guarded so multiple includes never double-register.
 {% endcomment %}
 <script>
 document.addEventListener('alpine:init', () => {
     if (window.Alpine && !window.Alpine.__cottonScrollspy) {
         window.Alpine.__cottonScrollspy = true;
-        Alpine.data('cottonScrollspy', () => ({
+        Alpine.data('cottonScrollspy', (rootSel = '') => ({
+            rootSel,
             active: null,
-            _observer: null,
-            init() {
-                // A nested [data-spy-root] scopes the observer to that scroll container;
-                // otherwise sections are tracked against the viewport.
-                const scopeRoot = this.$root.querySelector('[data-spy-root]');
-                const searchIn = scopeRoot || document;
-                const sections = Array.from(searchIn.querySelectorAll('[data-spy-section]'));
-                if (!sections.length) return;
-                this._observer = new IntersectionObserver((entries) => {
-                    // the topmost section currently intersecting the upper part of the root wins
-                    const visible = entries.filter(e => e.isIntersecting)
-                        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-                    if (visible.length) this.active = visible[0].target.id;
-                }, { root: scopeRoot || null, rootMargin: '0px 0px -55% 0px', threshold: 0 });
-                sections.forEach(s => this._observer.observe(s));
-                this.active = this.active || sections[0].id;
+            _cleanup: null,
+            _raf: null,
+            // Nearest scrolling ancestor of an element, or null for the page/viewport. Stops before
+            // <body>/<html> — page scroll is handled as the viewport (window), not those elements.
+            _scrollParent(el) {
+                for (let n = el && el.parentElement; n && n !== document.body && n !== document.documentElement; n = n.parentElement) {
+                    const oy = getComputedStyle(n).overflowY;
+                    if ((oy === 'auto' || oy === 'scroll') && n.scrollHeight > n.clientHeight) return n;
+                }
+                return null;
             },
-            destroy() { this._observer && this._observer.disconnect(); },
+            // Explicit `root` selector wins; otherwise auto-detect from a reference element.
+            _root(ref) { return this.rootSel ? document.querySelector(this.rootSel) : this._scrollParent(ref); },
+            init() {
+                // Tracked ids come from this nav's own links (#hrefs cover `spy` items and manual
+                // links), plus any optional [data-spy-section] for link-less sections.
+                const ids = new Set();
+                this.$root.querySelectorAll('a[href^="#"]').forEach((a) => {
+                    const id = a.getAttribute('href').slice(1);
+                    if (id) ids.add(id);
+                });
+                document.querySelectorAll('[data-spy-section]').forEach((el) => { if (el.id) ids.add(el.id); });
+                const sections = [...ids].map((id) => document.getElementById(id)).filter(Boolean)
+                    .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) ? -1 : 1);
+                if (!sections.length) return;
+                const root = this._root(sections[0]);
+                // Position-based: the active section is the LAST one whose top has crossed an "active
+                // line" a little below the top of the scroll area. Recomputed from all sections each
+                // frame, so the highlight tracks correctly scrolling either way and never skips one.
+                const compute = () => {
+                    const rect = root ? root.getBoundingClientRect() : { top: 0, height: window.innerHeight };
+                    const line = rect.top + Math.min(rect.height * 0.25, 120);
+                    let current = sections[0].id;
+                    for (const s of sections) {
+                        if (s.getBoundingClientRect().top - line <= 1) current = s.id;
+                        else break;  // sorted in document order, so the rest are below the line
+                    }
+                    this.active = current;
+                };
+                const onScroll = () => {
+                    if (this._raf) return;
+                    this._raf = requestAnimationFrame(() => { this._raf = null; compute(); });
+                };
+                const scroller = root || window;
+                scroller.addEventListener('scroll', onScroll, { passive: true });
+                window.addEventListener('resize', onScroll, { passive: true });
+                this._cleanup = () => {
+                    scroller.removeEventListener('scroll', onScroll);
+                    window.removeEventListener('resize', onScroll);
+                    if (this._raf) cancelAnimationFrame(this._raf);
+                };
+                compute();
+            },
+            destroy() { this._cleanup && this._cleanup(); },
             isActive(id) { return this.active === id; },
             scrollTo(id) {
-                const root = this.$root.querySelector('[data-spy-root]');
-                // `root` is an element (no getElementById); scope the lookup with querySelector.
-                const target = root ? root.querySelector('#' + CSS.escape(id)) : document.getElementById(id);
+                const target = document.getElementById(id);
                 if (!target) return;
+                const root = this._root(target);
                 if (root) {
-                    // scroll only the container, never the page. Honour the target's
-                    // scroll-margin-top (e.g. a `scroll-mt-*` class) so it lands just above the anchor.
+                    // scroll only the container, never the page. Honour the target's scroll-margin-top
+                    // (e.g. a `scroll-mt-*` class) so it lands just below the top rather than flush.
                     const offset = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
                     root.scrollTo({ top: root.scrollTop + target.getBoundingClientRect().top - root.getBoundingClientRect().top - offset, behavior: 'smooth' });
                 } else {
@@ -53,4 +94,4 @@ document.addEventListener('alpine:init', () => {
     }
 });
 </script>
-<div x-data="cottonScrollspy" {{ attrs }} class="{{ class }}">{{ slot }}</div>
+<div x-data="cottonScrollspy('{{ root }}')" {{ attrs }} class="{{ class }}">{{ slot }}</div>

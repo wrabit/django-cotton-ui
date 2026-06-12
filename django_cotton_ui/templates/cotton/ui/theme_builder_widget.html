@@ -260,7 +260,7 @@ By default the working theme is saved to localStorage so it survives navigation 
             rings: [['0','0px'],['1','1px'],['2','2px'],['4','4px']],
 
             // Defaults mirror the kit's shipped tokens, so an untouched panel emits the stock theme.
-            defaults: { accent: 'teal', gray: 'zinc', radius: '0.375rem', buttonRadius: 'default', radiusBox: '0.5rem', focusRing: '2px', inputShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)', borders: true, surfaceLight: 100, surfaceDark: 8 },
+            defaults: { accent: 'teal', gray: 'zinc', radius: '0.375rem', buttonRadius: 'default', radiusBox: '0.5rem', focusRing: '2px', inputShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)', borders: true, surfaceLight: 100, surfaceDark: 6 },
 
             accent: 'teal',
             gray: 'zinc',
@@ -272,7 +272,7 @@ By default the working theme is saved to localStorage so it survives navigation 
             boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
             borders: true,
             surfaceLight: 100,  /* --surface-level per mode: how much lighter surfaces are than the page */
-            surfaceDark: 8,
+            surfaceDark: 6,
 
             isDark: false,
             panelOpen: false,
@@ -412,7 +412,7 @@ By default the working theme is saved to localStorage so it survives navigation 
                     '    --color-accent: var(--color-' + this.accent + '-400);\n' +
                     '    --color-accent-content: var(--color-' + this.accent + '-300);\n' +
                     '    --color-accent-foreground: var(--color-' + this.accent + '-950);\n' +
-                    (this.surfaceDark !== 8 ? '    --surface-level: ' + this.surfaceDark + '%;\n' : '') +
+                    (this.surfaceDark !== 6 ? '    --surface-level: ' + this.surfaceDark + '%;\n' : '') +
                     '}' + grayBlock;
             },
 
