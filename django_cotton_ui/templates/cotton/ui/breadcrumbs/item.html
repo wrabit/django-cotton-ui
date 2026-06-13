@@ -4,10 +4,10 @@
     class=""
 />
 
-<li class="flex items-center gap-1.5 before:mr-0.5 before:text-zinc-300 dark:before:text-zinc-600 before:content-[var(--bc-separator)] first:before:content-['']">
+<li class="flex items-center gap-1.5 before:mr-0.5 before:text-ink-300 dark:before:text-ink-600 before:content-[var(--bc-separator)] first:before:content-['']">
   {% if href and not current %}
-    <a href="{{ href }}" class="hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors {{ class }}">{{ slot }}</a>
+    <a href="{{ href }}" class="hover:text-ink-700 dark:hover:text-ink-200 transition-colors {{ class }}">{{ slot }}</a>
   {% else %}
-    <span class="{% if current %}font-medium text-zinc-900 dark:text-zinc-100{% endif %} {{ class }}" {% if current %}aria-current="page"{% endif %}>{{ slot }}</span>
+    <span class="{% if current %}font-medium text-ink-900 dark:text-ink-100{% endif %} {{ class }}" {% if current %}aria-current="page"{% endif %}>{{ slot }}</span>
   {% endif %}
 </li>

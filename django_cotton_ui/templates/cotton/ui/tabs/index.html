@@ -26,9 +26,9 @@ class="w-full space-y-4"
     <div class="
         flex items-center
         {% if variant == 'segmented' %}
-            bg-zinc-100 dark:bg-zinc-800 p-1 rounded-box
+            bg-ink-100 dark:bg-ink-800 p-1 rounded-box
         {% else %}
-            border-b border-zinc-200 dark:border-zinc-700 w-full
+            border-b border-ink-200 dark:border-ink-700 w-full
         {% endif %}
         overflow-x-auto no-scrollbar
     ">
@@ -51,15 +51,15 @@ class="w-full space-y-4"
                 "
                 :class="{
                     {% if variant == 'segmented' %}
-                        'bg-white text-zinc-950 shadow-sm dark:bg-zinc-950 dark:text-zinc-50': isActive(tab.name),
-                        'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100': !isActive(tab.name)
+                        'bg-white text-ink-950 shadow-sm dark:bg-ink-950 dark:text-ink-50': isActive(tab.name),
+                        'text-ink-500 hover:text-ink-900 dark:text-ink-400 dark:hover:text-ink-100': !isActive(tab.name)
                     {% else %}
                         {% if accent %}
                             'border-accent text-accent': isActive(tab.name),
                         {% else %}
-                            'border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100': isActive(tab.name),
+                            'border-ink-900 text-ink-900 dark:border-ink-100 dark:text-ink-100': isActive(tab.name),
                         {% endif %}
-                        'border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200': !isActive(tab.name)
+                        'border-transparent text-ink-500 hover:border-ink-300 hover:text-ink-700 dark:text-ink-400 dark:hover:border-ink-600 dark:hover:text-ink-200': !isActive(tab.name)
                     {% endif %}
                 }"
             >

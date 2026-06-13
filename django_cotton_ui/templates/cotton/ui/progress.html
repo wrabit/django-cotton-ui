@@ -14,6 +14,7 @@
     }"
     :color_classes="{
         'accent': 'bg-accent',
+        'ink': 'bg-ink-500 dark:bg-ink-400',
         'zinc': 'bg-zinc-500 dark:bg-zinc-400',
         'blue': 'bg-blue-500',
         'sky': 'bg-sky-500',
@@ -32,7 +33,7 @@
         aria-valuemin="0"
         aria-valuemax="100"
         {{ attrs }}
-        class="flex-1 {{ size_classes|get_item:size }} bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden"
+        class="flex-1 {{ size_classes|get_item:size }} bg-ink-200 dark:bg-ink-700 rounded-full overflow-hidden"
     >
         <div
             class="h-full rounded-full transition-[width] duration-500 ease-out {% if bar_class %}{{ bar_class }}{% elif not accent %}bg-[var(--color-muted,currentColor)]{% else %}{{ color_classes|get_item:color }}{% endif %}"
@@ -40,6 +41,6 @@
         ></div>
     </div>
     {% if show_value %}
-        <span class="shrink-0 w-10 text-right text-sm font-medium text-zinc-600 dark:text-zinc-400 tabular-nums">{{ value }}%</span>
+        <span class="shrink-0 w-10 text-right text-sm font-medium text-ink-600 dark:text-ink-400 tabular-nums">{{ value }}%</span>
     {% endif %}
 </div>

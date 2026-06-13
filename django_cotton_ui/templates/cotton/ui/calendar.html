@@ -36,20 +36,20 @@ both the datepicker and a bare calendar serialise consistently.
     x-bind="root"
     {{ attrs }}
     x-modelable="modeHandler.value"
-    class="p-3 bg-white dark:bg-zinc-800 border border-[color:var(--color-box-border)] rounded-control shadow-sm {% if full %}w-full{% else %}w-[280px]{% endif %} {{ class }}">
+    class="p-3 bg-white dark:bg-ink-800 border border-[color:var(--color-box-border)] rounded-control shadow-sm {% if full %}w-full{% else %}w-[280px]{% endif %} {{ class }}">
     <div class="flex items-center justify-between mb-4">
         <button type="button" @click="headerPrev()" aria-label="Previous"
-            class="inline-flex items-center justify-center w-7 h-7 rounded-control hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors focus-ring">
+            class="inline-flex items-center justify-center w-7 h-7 rounded-control hover:bg-ink-100 dark:hover:bg-ink-700 transition-colors focus-ring">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </button>
         <button type="button" @click="view === 'days' ? showMonths() : (view === 'months' ? showYears() : null)"
-            class="px-2 py-1 rounded-control text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors focus-ring">
+            class="px-2 py-1 rounded-control text-sm font-medium text-ink-900 dark:text-ink-100 hover:bg-ink-100 dark:hover:bg-ink-700 transition-colors focus-ring">
             <span x-show="view === 'days'"><span x-text="monthNames[month]"></span> <span x-text="year"></span></span>
             <span x-show="view === 'months'" x-text="year"></span>
             <span x-show="view === 'years'" x-text="yearRange[0] + ' – ' + yearRange[yearRange.length - 1]"></span>
         </button>
         <button type="button" @click="headerNext()" aria-label="Next"
-            class="inline-flex items-center justify-center w-7 h-7 rounded-control hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors focus-ring">
+            class="inline-flex items-center justify-center w-7 h-7 rounded-control hover:bg-ink-100 dark:hover:bg-ink-700 transition-colors focus-ring">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </button>
     </div>
@@ -59,7 +59,7 @@ both the datepicker and a bare calendar serialise consistently.
     <div class="grid grid-cols-7 mb-2">
         <template x-for="(day, index) in days">
             <div class="flex items-center justify-center h-9">
-                <div x-text="day" class="text-xs font-medium text-zinc-500 dark:text-zinc-400"></div>
+                <div x-text="day" class="text-xs font-medium text-ink-500 dark:text-ink-400"></div>
             </div>
         </template>
     </div>
@@ -71,10 +71,10 @@ both the datepicker and a bare calendar serialise consistently.
             <button tabindex="-1" type="button"
                 x-effect="focusedDay == day && ($root.contains($focus.focused()))  && $el.focus({preventScroll: true})"
                 x-text="day" :disabled="isDisabled(new Date(year, month, day))" @click="dayClicked(day);" @mouseenter="dayHovered(day)" :class="{
-                        'bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100': isToday(day) == true && isSelectedDay(day) == false && !isDisabled(new Date(year, month, day)) && !isRangeMiddle(new Date(year, month, day)) && !isInPreviewRange(day),
-                        'text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700': isToday(day) == false && isSelectedDay(day) == false && !isDisabled(new Date(year, month, day)) && !isRangeMiddle(new Date(year, month, day)) && !isInPreviewRange(day),
+                        'bg-ink-100 dark:bg-ink-700 text-ink-900 dark:text-ink-100': isToday(day) == true && isSelectedDay(day) == false && !isDisabled(new Date(year, month, day)) && !isRangeMiddle(new Date(year, month, day)) && !isInPreviewRange(day),
+                        'text-ink-900 dark:text-ink-100 hover:bg-ink-100 dark:hover:bg-ink-700': isToday(day) == false && isSelectedDay(day) == false && !isDisabled(new Date(year, month, day)) && !isRangeMiddle(new Date(year, month, day)) && !isInPreviewRange(day),
                         'bg-accent text-accent-foreground' : (isSelectedDay(day) == true && !isDisabled(new Date(year, month, day))) || isRangeMiddle(new Date(year, month, day)) || isInPreviewRange(day),
-                        'text-zinc-300 dark:text-zinc-600 cursor-not-allowed': isDisabled(new Date(year, month, day)),
+                        'text-ink-300 dark:text-ink-600 cursor-not-allowed': isDisabled(new Date(year, month, day)),
                     }"
                 class="flex items-center justify-center h-9 {% if full %}w-full{% else %}w-9{% endif %} text-sm rounded-control transition-colors focus-ring disabled:cursor-not-allowed">
             </button>
@@ -90,7 +90,7 @@ both the datepicker and a bare calendar serialise consistently.
     <div x-show="view === 'months'" x-cloak class="grid grid-cols-3 gap-2">
         <template x-for="(m, idx) in monthNames" :key="idx">
             <button type="button" @click="selectMonth(idx)" x-text="m.slice(0, 3)"
-                :class="idx === month ? 'bg-accent text-accent-foreground' : 'text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700'"
+                :class="idx === month ? 'bg-accent text-accent-foreground' : 'text-ink-900 dark:text-ink-100 hover:bg-ink-100 dark:hover:bg-ink-700'"
                 class="py-2 text-sm rounded-control transition-colors focus-ring"></button>
         </template>
     </div>
@@ -99,7 +99,7 @@ both the datepicker and a bare calendar serialise consistently.
     <div x-show="view === 'years'" x-cloak class="grid grid-cols-3 gap-2">
         <template x-for="y in yearRange" :key="y">
             <button type="button" @click="selectYear(y)" x-text="y"
-                :class="y === year ? 'bg-accent text-accent-foreground' : 'text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700'"
+                :class="y === year ? 'bg-accent text-accent-foreground' : 'text-ink-900 dark:text-ink-100 hover:bg-ink-100 dark:hover:bg-ink-700'"
                 class="py-2 text-sm rounded-control transition-colors focus-ring"></button>
         </template>
     </div>

@@ -8,7 +8,7 @@
     <div x-data="{ expanded: {{ expanded|lower }} }" class="space-y-1">
         <button
             @click="expanded = !expanded"
-            class="w-full flex items-center justify-between px-3 py-2 font-semibold text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+            class="w-full flex items-center justify-between px-3 py-2 font-semibold text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-300 transition-colors"
         >
             <span>{{ heading }}</span>
             <svg
@@ -33,7 +33,7 @@
 {% else %}
     <div class="pt-5 first:pt-0">
         {% if heading %}
-            <div class="pr-2 pb-2 text-sm text-zinc-400 dark:text-zinc-500">
+            <div class="pr-2 pb-2 text-sm text-ink-400 dark:text-ink-500">
                 {{ heading }}
             </div>
         {% endif %}

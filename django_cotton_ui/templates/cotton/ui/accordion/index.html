@@ -7,7 +7,7 @@ borders with utility classes. For example add horizontal padding on each item
 accordion, or drop it in a flush card so the dividers run edge to edge.
 {% endcomment %}
 <div x-data="accordion('{{ type }}', {{ collapsible|json_dumps }}, {{ disabled|json_dumps }})"
-    {{ attrs.dict|merge:'class:w-full divide-y divide-zinc-200 dark:divide-zinc-700' }}>
+    {{ attrs.dict|merge:'class:w-full divide-y divide-ink-200 dark:divide-ink-700' }}>
     {% if icon_closed %}
     <template data-accordion-icon-closed>{{ icon_closed }}</template>
     {% endif %}

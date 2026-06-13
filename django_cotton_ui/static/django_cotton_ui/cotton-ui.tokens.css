@@ -2,8 +2,8 @@
    focus ring) and x-cloak. Brand by overriding --color-accent via :root / .dark. */
 
 @theme {
-    --color-accent: var(--color-zinc-900);
-    --color-accent-content: var(--color-zinc-700);
+    --color-accent: var(--color-ink-900);
+    --color-accent-content: var(--color-ink-700);
     --color-accent-foreground: var(--color-white);
 
     /* Radius is split by role, not by size, and kept in its own namespace so it never
@@ -63,13 +63,30 @@
     --color-olive-800: oklch(28.6% 0.016 107.4);
     --color-olive-900: oklch(22.8% 0.013 107.4);
     --color-olive-950: oklch(15.3% 0.006 107.1);
+
+    /* Neutral scale the components are authored against. Defaults to the zinc look, so the
+       precompiled (no-build / CDN) stylesheet needs zero config. Re-tone the whole UI by
+       overriding --color-ink-* (directly or via the theme builder) WITHOUT touching a
+       consumer's own zinc-* usage. Kept as var() refs so an app that re-themes zinc still
+       cascades through; the priming list forces both scales into the shipped CSS. */
+    --color-ink-50: var(--color-zinc-50);
+    --color-ink-100: var(--color-zinc-100);
+    --color-ink-200: var(--color-zinc-200);
+    --color-ink-300: var(--color-zinc-300);
+    --color-ink-400: var(--color-zinc-400);
+    --color-ink-500: var(--color-zinc-500);
+    --color-ink-600: var(--color-zinc-600);
+    --color-ink-700: var(--color-zinc-700);
+    --color-ink-800: var(--color-zinc-800);
+    --color-ink-900: var(--color-zinc-900);
+    --color-ink-950: var(--color-zinc-950);
 }
 
 /* The remaining component tokens live in the `theme` layer so a consumer's @theme /
    @layer theme overrides always win (light and dark stay in the same layer, no cascade upset). */
 @layer theme {
     :root {
-        --color-bg: var(--color-zinc-50);       /* page base */
+        --color-bg: var(--color-ink-50);       /* page base */
         /* Raised surfaces (cards, dialogs, menus) are derived from the page bg, lifted
            toward white by --surface-level. Higher = more contrast off the page. Light
            defaults to 100% (white); .dark uses a subtle lift. Set --color-surface
@@ -77,7 +94,8 @@
         --surface-level: 100%;
         --color-surface: color-mix(in oklab, var(--color-bg), white var(--surface-level));
         --color-input-bg: transparent;          /* form fields: border-defined in light; see .dark for the lift */
-        --color-box-border: var(--color-zinc-200);  /* border for box-role surfaces (cards, dialogs, menus); set transparent for a shadow-only look. NOT inputs (see --radius-control). */
+        --color-box-border: var(--color-ink-200);  /* border for box-role surfaces (cards, dialogs, menus); set transparent for a shadow-only look. NOT inputs (see --radius-control). */
+        --color-muted: var(--color-ink-900);    /* the off-accent fill: components with :accent=false use ink here, so they re-tone with the Ink control */
 
         --shadow-input: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         --shadow-box: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -89,12 +107,13 @@
     }
 
     .dark {
-        --color-accent: var(--color-zinc-100);
-        --color-accent-content: var(--color-zinc-300);
-        --color-accent-foreground: var(--color-zinc-900);
-        --color-bg: var(--color-zinc-900);
+        --color-accent: var(--color-ink-100);
+        --color-accent-content: var(--color-ink-300);
+        --color-accent-foreground: var(--color-ink-900);
+        --color-bg: var(--color-ink-900);
         --surface-level: 6%;  /* subtle lift off the dark page */
-        --color-box-border: var(--color-zinc-700);
+        --color-box-border: var(--color-ink-700);
+        --color-muted: var(--color-ink-100);
         /* Inputs lift off any surface (page or card) via a translucent lighten. */
         --color-input-bg: color-mix(in oklab, white 4%, transparent);
         --focus-ring-offset-color: #18181b; /* zinc-900 */
@@ -120,7 +139,7 @@
 .ui-range {
     --range-fill-color: var(--color-accent);   /* completed portion + thumb; neutral via .ui-range-neutral */
     --range-track-bg: var(--color-input-bg);    /* unfilled track: same surface as an input/unchecked checkbox */
-    --range-border: var(--color-zinc-300);      /* track + thumb border, matched to inputs/radio; .dark override below */
+    --range-border: var(--color-ink-300);      /* track + thumb border, matched to inputs/radio; .dark override below */
     @apply w-full cursor-pointer appearance-none bg-transparent;
     &:disabled { @apply cursor-not-allowed opacity-50; }
 
@@ -144,9 +163,9 @@
     &:focus-visible::-webkit-slider-thumb { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: 2px; }
     &:focus-visible::-moz-range-thumb { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: 2px; }
 }
-.dark .ui-range { --range-border: var(--color-zinc-700); }
-.ui-range-neutral { --range-fill-color: var(--color-zinc-400); }
-.dark .ui-range-neutral { --range-fill-color: var(--color-zinc-500); }
+.dark .ui-range { --range-border: var(--color-ink-700); }
+.ui-range-neutral { --range-fill-color: var(--color-ink-400); }
+.dark .ui-range-neutral { --range-fill-color: var(--color-ink-500); }
 
 /* Alpine.js x-cloak */
 [x-cloak] {

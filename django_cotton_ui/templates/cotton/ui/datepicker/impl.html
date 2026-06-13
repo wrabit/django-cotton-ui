@@ -36,8 +36,8 @@
     {{ attrs.dict|merge:'class:relative' }}>
     <button type="button" x-bind="trigger"
         :class="{ 'ring-[length:var(--focus-ring-width)] ring-[var(--focus-ring-color)]': open }"
-        class="inline-flex items-center justify-start w-full {{ size_classes|get_item:size }} font-normal text-left border border-zinc-300 dark:border-zinc-600 rounded-control bg-[var(--color-input-bg)] hover:bg-zinc-50 dark:hover:bg-zinc-700 focus-ring transition-colors">
-        <svg class="mr-2 h-4 w-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        class="inline-flex items-center justify-start w-full {{ size_classes|get_item:size }} font-normal text-left border border-ink-300 dark:border-ink-600 rounded-control bg-[var(--color-input-bg)] hover:bg-ink-50 dark:hover:bg-ink-700 focus-ring transition-colors">
+        <svg class="mr-2 h-4 w-4 text-ink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>

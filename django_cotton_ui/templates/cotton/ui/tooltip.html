@@ -197,14 +197,14 @@
             x-transition:leave-end="opacity-0 scale-95"
             x-ref="tooltip"
             role="tooltip"
-            class="absolute z-[100] w-max max-w-xs rounded-control bg-zinc-900 dark:bg-zinc-700 {{ size_classes|get_item:size }} font-medium text-white shadow-lg pointer-events-none"
+            class="absolute z-[100] w-max max-w-xs rounded-control bg-ink-900 dark:bg-ink-700 {{ size_classes|get_item:size }} font-medium text-white shadow-lg pointer-events-none"
             :style="`left: ${tooltipPosition.x}px; top: ${tooltipPosition.y}px;`"
         >
             {{ content }}
             {% if arrow %}
             {# Tail: a rotated square at the edge facing the trigger; follows the flipped side #}
             <div
-                class="absolute w-2 h-2 bg-zinc-900 dark:bg-zinc-700"
+                class="absolute w-2 h-2 bg-ink-900 dark:bg-ink-700"
                 :style="currentPos === 'top'    ? `left:${arrowOffset}px; bottom:-4px; transform:translateX(-50%) rotate(45deg)`
                       : currentPos === 'bottom' ? `left:${arrowOffset}px; top:-4px; transform:translateX(-50%) rotate(45deg)`
                       : currentPos === 'left'   ? `top:${arrowOffset}px; right:-4px; transform:translateY(-50%) rotate(45deg)`

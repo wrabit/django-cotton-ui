@@ -13,21 +13,21 @@
    slide-over (c-ui.drawer) instead of an inline collapse.{% endcomment %}
 <header
     {{ attrs }}
-    class="{% if sticky %}sticky top-0{% else %}relative{% endif %} z-40 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur {{ class }}"
+    class="{% if sticky %}sticky top-0{% else %}relative{% endif %} z-40 w-full border-b border-ink-200 dark:border-ink-800 bg-white/80 dark:bg-ink-900/80 backdrop-blur {{ class }}"
     x-data="{ open: false }"
 >
     <div class="flex h-14 items-center gap-4 px-4">
-        <div class="flex items-center gap-2 shrink-0 text-zinc-900 dark:text-white">{{ brand }}</div>
+        <div class="flex items-center gap-2 shrink-0 text-ink-900 dark:text-white">{{ brand }}</div>
 
         <nav class="hidden md:flex items-center gap-1 [&>a]:text-sm [&>a]:font-medium [&>a]:transition-colors
             {% if variant == 'underline' %}
-                [&>a]:px-1 [&>a]:py-2 [&>a]:border-b-2 [&>a]:border-transparent [&>a]:text-zinc-600 dark:[&>a]:text-zinc-400 [&>a:hover]:text-zinc-900 dark:[&>a:hover]:text-white [&>.is-current]:text-zinc-900 dark:[&>.is-current]:text-white [&>.is-current]:border-accent
+                [&>a]:px-1 [&>a]:py-2 [&>a]:border-b-2 [&>a]:border-transparent [&>a]:text-ink-600 dark:[&>a]:text-ink-400 [&>a:hover]:text-ink-900 dark:[&>a:hover]:text-white [&>.is-current]:text-ink-900 dark:[&>.is-current]:text-white [&>.is-current]:border-accent
             {% elif variant == 'pill' %}
-                [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-zinc-600 dark:[&>a]:text-zinc-300 [&>a:hover]:bg-zinc-100 dark:[&>a:hover]:bg-zinc-800 [&>.is-current]:bg-accent [&>.is-current]:text-accent-foreground
+                [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-ink-600 dark:[&>a]:text-ink-300 [&>a:hover]:bg-ink-100 dark:[&>a:hover]:bg-ink-800 [&>.is-current]:bg-accent [&>.is-current]:text-accent-foreground
             {% elif variant == 'ghost' %}
-                [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-zinc-600 dark:[&>a]:text-zinc-400 [&>a:hover]:bg-zinc-100 dark:[&>a:hover]:bg-zinc-800 [&>a:hover]:text-zinc-900 dark:[&>a:hover]:text-white [&>.is-current]:bg-accent/15 dark:[&>.is-current]:bg-accent/20 [&>.is-current]:text-accent-content dark:[&>.is-current]:text-accent
+                [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-ink-600 dark:[&>a]:text-ink-400 [&>a:hover]:bg-ink-100 dark:[&>a:hover]:bg-ink-800 [&>a:hover]:text-ink-900 dark:[&>a:hover]:text-white [&>.is-current]:bg-accent/15 dark:[&>.is-current]:bg-accent/20 [&>.is-current]:text-accent-content dark:[&>.is-current]:text-accent
             {% else %}
-                [&>a]:px-2 [&>a]:py-2 [&>a]:text-zinc-600 dark:[&>a]:text-zinc-400 [&>a:hover]:text-zinc-900 dark:[&>a:hover]:text-white [&>.is-current]:text-accent
+                [&>a]:px-2 [&>a]:py-2 [&>a]:text-ink-600 dark:[&>a]:text-ink-400 [&>a:hover]:text-ink-900 dark:[&>a:hover]:text-white [&>.is-current]:text-accent
             {% endif %}">{{ slot }}</nav>
 
         <div class="ml-auto hidden md:flex items-center gap-2">{{ actions }}</div>
@@ -36,7 +36,7 @@
         <button
             type="button"
             @click="open = !open"
-            class="ml-auto md:hidden inline-flex items-center justify-center rounded-control p-2 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-ring"
+            class="ml-auto md:hidden inline-flex items-center justify-center rounded-control p-2 text-ink-600 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800 focus-ring"
             :aria-expanded="open"
             aria-label="Toggle menu"
         >
@@ -54,9 +54,9 @@
         <c-ui.drawer x-model="open" class="md:hidden">
             {% if brand %}<c-slot name="header">{{ brand }}</c-slot>{% endif %}
             <c-slot name="content">
-                <nav data-dropdown-collapse class="flex flex-col gap-1 [&>a]:text-sm [&>a]:font-medium [&>a]:transition-colors [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-zinc-600 dark:[&>a]:text-zinc-400 [&>a:hover]:bg-zinc-100 dark:[&>a:hover]:bg-zinc-800 [&>.is-current]:text-accent">{{ slot }}</nav>
-                {% if actions %}<div class="flex flex-col gap-2 pt-4 mt-4 border-t border-zinc-200 dark:border-zinc-800">{{ actions }}</div>{% endif %}
-                {% if mobile %}<div class="pt-4 mt-4 border-t border-zinc-200 dark:border-zinc-800">{{ mobile }}</div>{% endif %}
+                <nav data-dropdown-collapse class="flex flex-col gap-1 [&>a]:text-sm [&>a]:font-medium [&>a]:transition-colors [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-ink-600 dark:[&>a]:text-ink-400 [&>a:hover]:bg-ink-100 dark:[&>a:hover]:bg-ink-800 [&>.is-current]:text-accent">{{ slot }}</nav>
+                {% if actions %}<div class="flex flex-col gap-2 pt-4 mt-4 border-t border-ink-200 dark:border-ink-800">{{ actions }}</div>{% endif %}
+                {% if mobile %}<div class="pt-4 mt-4 border-t border-ink-200 dark:border-ink-800">{{ mobile }}</div>{% endif %}
             </c-slot>
         </c-ui.drawer>
     {% else %}
@@ -65,11 +65,11 @@
             x-show="open"
             x-cloak
             x-collapse
-            class="md:hidden border-t border-zinc-200 dark:border-zinc-800 px-4 py-3 space-y-1"
+            class="md:hidden border-t border-ink-200 dark:border-ink-800 px-4 py-3 space-y-1"
         >
-            <nav data-dropdown-collapse class="flex flex-col gap-1 [&>a]:text-sm [&>a]:font-medium [&>a]:transition-colors [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-zinc-600 dark:[&>a]:text-zinc-400 [&>a:hover]:bg-zinc-100 dark:[&>a:hover]:bg-zinc-800 [&>.is-current]:text-accent">{{ slot }}</nav>
+            <nav data-dropdown-collapse class="flex flex-col gap-1 [&>a]:text-sm [&>a]:font-medium [&>a]:transition-colors [&>a]:px-3 [&>a]:py-2 [&>a]:rounded-control [&>a]:text-ink-600 dark:[&>a]:text-ink-400 [&>a:hover]:bg-ink-100 dark:[&>a:hover]:bg-ink-800 [&>.is-current]:text-accent">{{ slot }}</nav>
             <div class="flex flex-col gap-2 pt-2">{{ actions }}</div>
-            {% if mobile %}<div class="pt-3 mt-2 border-t border-zinc-200 dark:border-zinc-800">{{ mobile }}</div>{% endif %}
+            {% if mobile %}<div class="pt-3 mt-2 border-t border-ink-200 dark:border-ink-800">{{ mobile }}</div>{% endif %}
         </div>
     {% endif %}
 </header>

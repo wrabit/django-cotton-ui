@@ -47,7 +47,7 @@
     {% else %}
         {% comment %}Radio indicator (default and cards variants only, hidden for segmented){% endcomment %}
         <div x-show="{% if show_indicator %}(() => { const v = $el.closest('[data-variant]')?.dataset.variant || 'default'; return v !== 'segmented' && v !== 'pill'; })(){% else %}false{% endif %}" class="flex items-center mt-0.5 h-5">
-            <div class="flex items-center justify-center w-[1.125rem] h-[1.125rem] rounded-full border-2 border-zinc-300 dark:border-zinc-600 transition-all">
+            <div class="flex items-center justify-center w-[1.125rem] h-[1.125rem] rounded-full border-2 border-ink-300 dark:border-ink-600 transition-all">
                 <div class="size-2.5 rounded-full transition-opacity"
                      :class="{
                          'opacity-100': isSelected('{{ value }}'),
@@ -74,7 +74,7 @@
                     {{ label }}
                 </div>
                 {% if description %}
-                    <div class="text-zinc-600 dark:text-zinc-400 mt-1">
+                    <div class="text-ink-600 dark:text-ink-400 mt-1">
                         {{ description }}
                     </div>
                 {% endif %}

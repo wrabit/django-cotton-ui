@@ -23,9 +23,9 @@
         {% if variant == 'default' %}
             class="{% if horizontal %}flex flex-wrap items-center gap-x-6 gap-y-2{% else %}space-y-3{% endif %} {{ class }}"
         {% elif variant == 'segmented' %}
-            class="inline-flex border border-zinc-200 dark:border-zinc-700 bg-[var(--color-input-bg)] rounded-control {{ class }}"
+            class="inline-flex border border-ink-200 dark:border-ink-700 bg-[var(--color-input-bg)] rounded-control {{ class }}"
         {% elif variant == 'pill' %}
-            class="inline-flex border border-zinc-200 dark:border-zinc-700 bg-[var(--color-input-bg)] rounded-control p-0.5 {{ class }}"
+            class="inline-flex border border-ink-200 dark:border-ink-700 bg-[var(--color-input-bg)] rounded-control p-0.5 {{ class }}"
         {% elif variant == 'cards' %}
             class="flex gap-4 w-full {{ class }}"
         {% endif %}

@@ -9,7 +9,7 @@
 <li>
   <a href="{% if disabled or current %}#{% else %}{{ href }}{% endif %}"
      {% if current %}aria-current="page"{% endif %}
-     class="inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-control text-sm transition-colors focus-ring {% if current %}{% if accent %}bg-accent text-accent-foreground{% else %}bg-[var(--color-muted,currentColor)]{% endif %}{% elif disabled %}text-zinc-300 dark:text-zinc-600 pointer-events-none{% else %}text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800{% endif %} {{ class }}">
-    {% if current and not accent %}<span class="text-white dark:text-zinc-900">{{ slot }}</span>{% else %}{{ slot }}{% endif %}
+     class="inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-control text-sm transition-colors focus-ring {% if current %}{% if accent %}bg-accent text-accent-foreground{% else %}bg-[var(--color-muted,currentColor)]{% endif %}{% elif disabled %}text-ink-300 dark:text-ink-600 pointer-events-none{% else %}text-ink-600 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800{% endif %} {{ class }}">
+    {% if current and not accent %}<span class="text-white dark:text-ink-900">{{ slot }}</span>{% else %}{{ slot }}{% endif %}
   </a>
 </li>

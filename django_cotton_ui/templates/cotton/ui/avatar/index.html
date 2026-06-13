@@ -46,7 +46,7 @@ a status dot dropped in the default slot is never cut off.
     class="relative inline-flex shrink-0 items-center justify-center rounded-full {{ size_classes|get_item:size }} {{ class }}"
 >
     <span
-        class="flex size-full items-center justify-center overflow-hidden rounded-full font-medium {% if not color %}bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300{% endif %}"
+        class="flex size-full items-center justify-center overflow-hidden rounded-full font-medium {% if not color %}bg-ink-100 dark:bg-ink-700 text-ink-600 dark:text-ink-300{% endif %}"
         {% if color %}:class="colorClass"{% endif %}
     >
         {% if src %}<img src="{{ src }}" alt="{{ alt }}" class="size-full object-cover" />{% elif initials %}{{ initials }}{% else %}<svg class="size-2/3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.4 0-8 2.5-8 5.5V21h16v-1.5c0-3-3.6-5.5-8-5.5Z"/></svg>{% endif %}

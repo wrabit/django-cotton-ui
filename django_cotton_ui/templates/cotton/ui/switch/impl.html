@@ -50,11 +50,11 @@
             {% else %}
             'bg-[var(--color-muted,currentColor)]': switchOn,
             {% endif %}
-            'bg-zinc-200 dark:bg-zinc-700': !switchOn
+            'bg-ink-200 dark:bg-ink-700': !switchOn
         }"
     >
         <span
-            class="inline-block transform rounded-full bg-white dark:bg-zinc-900 shadow-lg
+            class="inline-block transform rounded-full bg-white dark:bg-ink-900 shadow-lg
                    {{ indicator_classes|get_item:size }}"
             :class="{
                 'transition-transform': ready,

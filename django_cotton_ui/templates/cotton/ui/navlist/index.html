@@ -30,12 +30,12 @@ in-nav navigation.
     class="
     {% if variant == 'sidebar' %}flex flex-col
         [&_a]:flex [&_a]:items-center [&_a]:justify-between [&_a]:gap-3 [&_a]:border-l-2 [&_a]:pl-4 [&_a]:pr-2 [&_a]:py-1 [&_a]:font-normal [&_a]:transition-colors
-        [&_a]:border-zinc-200 dark:[&_a]:border-zinc-800 [&_a]:text-zinc-600 dark:[&_a]:text-zinc-400 [&_a:hover]:text-zinc-900 dark:[&_a:hover]:text-zinc-100
-        [&_.is-current]:border-accent [&_.is-current]:text-zinc-900 dark:[&_.is-current]:text-white [&_.is-current]:font-semibold
+        [&_a]:border-ink-200 dark:[&_a]:border-ink-800 [&_a]:text-ink-600 dark:[&_a]:text-ink-400 [&_a:hover]:text-ink-900 dark:[&_a:hover]:text-ink-100
+        [&_.is-current]:border-accent [&_.is-current]:text-ink-900 dark:[&_.is-current]:text-white [&_.is-current]:font-semibold
     {% else %}flex flex-col gap-1
         [&_a]:flex [&_a]:items-center [&_a]:justify-between [&_a]:gap-3 [&_a]:px-3 [&_a]:py-2 [&_a]:rounded-control [&_a]:font-medium [&_a]:transition-colors
-        [&_a]:text-zinc-600 dark:[&_a]:text-zinc-400 [&_a:hover]:bg-zinc-50 dark:[&_a:hover]:bg-zinc-800/50 [&_a:hover]:text-zinc-900 dark:[&_a:hover]:text-zinc-100
-        [&_.is-current]:bg-zinc-100 [&_.is-current]:text-zinc-900 dark:[&_.is-current]:bg-zinc-800 dark:[&_.is-current]:text-zinc-100
+        [&_a]:text-ink-600 dark:[&_a]:text-ink-400 [&_a:hover]:bg-ink-50 dark:[&_a:hover]:bg-ink-800/50 [&_a:hover]:text-ink-900 dark:[&_a:hover]:text-ink-100
+        [&_.is-current]:bg-ink-100 [&_.is-current]:text-ink-900 dark:[&_.is-current]:bg-ink-800 dark:[&_.is-current]:text-ink-100
     {% endif %}
     {{ class }}"
     {{ attrs }}

@@ -57,7 +57,7 @@ By default the working theme is saved to localStorage so it survives navigation 
     {% comment %}Palette priming: forces the build to emit a --color-*-* var for every accent and gray
        shade the controls remap to live (the kit otherwise only emits the zinc scale it uses).
        Tailwind scans this literal class list at build time; the element never renders.{% endcomment %}
-    <div hidden aria-hidden="true" class="bg-red-300 bg-red-400 bg-red-500 bg-red-600 bg-red-950 bg-orange-300 bg-orange-400 bg-orange-500 bg-orange-600 bg-orange-950 bg-amber-300 bg-amber-400 bg-amber-500 bg-amber-600 bg-amber-950 bg-yellow-300 bg-yellow-400 bg-yellow-500 bg-yellow-600 bg-yellow-950 bg-lime-300 bg-lime-400 bg-lime-500 bg-lime-600 bg-lime-950 bg-green-300 bg-green-400 bg-green-500 bg-green-600 bg-green-950 bg-emerald-300 bg-emerald-400 bg-emerald-500 bg-emerald-600 bg-emerald-950 bg-teal-300 bg-teal-400 bg-teal-500 bg-teal-600 bg-teal-950 bg-cyan-300 bg-cyan-400 bg-cyan-500 bg-cyan-600 bg-cyan-950 bg-sky-300 bg-sky-400 bg-sky-500 bg-sky-600 bg-sky-950 bg-blue-300 bg-blue-400 bg-blue-500 bg-blue-600 bg-blue-950 bg-indigo-300 bg-indigo-400 bg-indigo-500 bg-indigo-600 bg-indigo-950 bg-violet-300 bg-violet-400 bg-violet-500 bg-violet-600 bg-violet-950 bg-purple-300 bg-purple-400 bg-purple-500 bg-purple-600 bg-purple-950 bg-fuchsia-300 bg-fuchsia-400 bg-fuchsia-500 bg-fuchsia-600 bg-fuchsia-950 bg-pink-300 bg-pink-400 bg-pink-500 bg-pink-600 bg-pink-950 bg-rose-300 bg-rose-400 bg-rose-500 bg-rose-600 bg-rose-950 bg-slate-50 bg-slate-100 bg-slate-200 bg-slate-300 bg-slate-400 bg-slate-500 bg-slate-600 bg-slate-700 bg-slate-800 bg-slate-900 bg-slate-950 bg-gray-50 bg-gray-100 bg-gray-200 bg-gray-300 bg-gray-400 bg-gray-500 bg-gray-600 bg-gray-700 bg-gray-800 bg-gray-900 bg-gray-950 bg-neutral-50 bg-neutral-100 bg-neutral-200 bg-neutral-300 bg-neutral-400 bg-neutral-500 bg-neutral-600 bg-neutral-700 bg-neutral-800 bg-neutral-900 bg-neutral-950 bg-stone-50 bg-stone-100 bg-stone-200 bg-stone-300 bg-stone-400 bg-stone-500 bg-stone-600 bg-stone-700 bg-stone-800 bg-stone-900 bg-stone-950 bg-taupe-50 bg-taupe-100 bg-taupe-200 bg-taupe-300 bg-taupe-400 bg-taupe-500 bg-taupe-600 bg-taupe-700 bg-taupe-800 bg-taupe-900 bg-taupe-950 bg-mauve-50 bg-mauve-100 bg-mauve-200 bg-mauve-300 bg-mauve-400 bg-mauve-500 bg-mauve-600 bg-mauve-700 bg-mauve-800 bg-mauve-900 bg-mauve-950 bg-mist-50 bg-mist-100 bg-mist-200 bg-mist-300 bg-mist-400 bg-mist-500 bg-mist-600 bg-mist-700 bg-mist-800 bg-mist-900 bg-mist-950 bg-olive-50 bg-olive-100 bg-olive-200 bg-olive-300 bg-olive-400 bg-olive-500 bg-olive-600 bg-olive-700 bg-olive-800 bg-olive-900 bg-olive-950"></div>
+    <div hidden aria-hidden="true" class="bg-red-300 bg-red-400 bg-red-500 bg-red-600 bg-red-950 bg-orange-300 bg-orange-400 bg-orange-500 bg-orange-600 bg-orange-950 bg-amber-300 bg-amber-400 bg-amber-500 bg-amber-600 bg-amber-950 bg-yellow-300 bg-yellow-400 bg-yellow-500 bg-yellow-600 bg-yellow-950 bg-lime-300 bg-lime-400 bg-lime-500 bg-lime-600 bg-lime-950 bg-green-300 bg-green-400 bg-green-500 bg-green-600 bg-green-950 bg-emerald-300 bg-emerald-400 bg-emerald-500 bg-emerald-600 bg-emerald-950 bg-teal-300 bg-teal-400 bg-teal-500 bg-teal-600 bg-teal-950 bg-cyan-300 bg-cyan-400 bg-cyan-500 bg-cyan-600 bg-cyan-950 bg-sky-300 bg-sky-400 bg-sky-500 bg-sky-600 bg-sky-950 bg-blue-300 bg-blue-400 bg-blue-500 bg-blue-600 bg-blue-950 bg-indigo-300 bg-indigo-400 bg-indigo-500 bg-indigo-600 bg-indigo-950 bg-violet-300 bg-violet-400 bg-violet-500 bg-violet-600 bg-violet-950 bg-purple-300 bg-purple-400 bg-purple-500 bg-purple-600 bg-purple-950 bg-fuchsia-300 bg-fuchsia-400 bg-fuchsia-500 bg-fuchsia-600 bg-fuchsia-950 bg-pink-300 bg-pink-400 bg-pink-500 bg-pink-600 bg-pink-950 bg-rose-300 bg-rose-400 bg-rose-500 bg-rose-600 bg-rose-950 bg-slate-50 bg-slate-100 bg-slate-200 bg-slate-300 bg-slate-400 bg-slate-500 bg-slate-600 bg-slate-700 bg-slate-800 bg-slate-900 bg-slate-950 bg-gray-50 bg-gray-100 bg-gray-200 bg-gray-300 bg-gray-400 bg-gray-500 bg-gray-600 bg-gray-700 bg-gray-800 bg-gray-900 bg-gray-950 bg-neutral-50 bg-neutral-100 bg-neutral-200 bg-neutral-300 bg-neutral-400 bg-neutral-500 bg-neutral-600 bg-neutral-700 bg-neutral-800 bg-neutral-900 bg-neutral-950 bg-stone-50 bg-stone-100 bg-stone-200 bg-stone-300 bg-stone-400 bg-stone-500 bg-stone-600 bg-stone-700 bg-stone-800 bg-stone-900 bg-stone-950 bg-taupe-50 bg-taupe-100 bg-taupe-200 bg-taupe-300 bg-taupe-400 bg-taupe-500 bg-taupe-600 bg-taupe-700 bg-taupe-800 bg-taupe-900 bg-taupe-950 bg-mauve-50 bg-mauve-100 bg-mauve-200 bg-mauve-300 bg-mauve-400 bg-mauve-500 bg-mauve-600 bg-mauve-700 bg-mauve-800 bg-mauve-900 bg-mauve-950 bg-mist-50 bg-mist-100 bg-mist-200 bg-mist-300 bg-mist-400 bg-mist-500 bg-mist-600 bg-mist-700 bg-mist-800 bg-mist-900 bg-mist-950 bg-olive-50 bg-olive-100 bg-olive-200 bg-olive-300 bg-olive-400 bg-olive-500 bg-olive-600 bg-olive-700 bg-olive-800 bg-olive-900 bg-olive-950 bg-ink-50 bg-ink-100 bg-ink-200 bg-ink-300 bg-ink-400 bg-ink-500 bg-ink-600 bg-ink-700 bg-ink-800 bg-ink-900 bg-ink-950"></div>
 
     {# ---- Card (expanded) ---- #}
     <div x-show="panelOpen" x-cloak
@@ -100,12 +100,30 @@ By default the working theme is saved to localStorage so it survives navigation 
                             style="background-color: var(--color-{{ c }}-500)"></button>
                     </c-ui.tooltip>
                     {% endfor %}
+
+                    {% comment %}Custom accent: the swatch opens the OS colour picker (native <input type=color>,
+                       hex); the field below takes any CSS colour (hex / rgb / oklch / named).{% endcomment %}
+                    <c-ui.tooltip size="xs">
+                        <c-slot name="content">Custom</c-slot>
+                        <label
+                            @click="accent = 'custom'; apply()"
+                            class="block size-6 rounded-full ring-1 ring-black/10 dark:ring-white/15 cursor-pointer transition-transform hover:scale-110"
+                            :class="accent === 'custom' ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-900 !ring-zinc-900 dark:!ring-white' : ''"
+                            :style="accent === 'custom' ? 'background-color: ' + customAccent : 'background: conic-gradient(from 0deg, #ef4444, #eab308, #22c55e, #06b6d4, #3b82f6, #d946ef, #ef4444)'">
+                            <input type="color" :value="customAccent" @input="setCustomAccent($event.target.value)"
+                                   class="sr-only" aria-label="Custom accent colour" />
+                        </label>
+                    </c-ui.tooltip>
                 </div>
+                <input x-show="accent === 'custom'" type="text" :value="customAccent"
+                    @change="setCustomAccent($event.target.value)" @keydown.enter.prevent="setCustomAccent($event.target.value)"
+                    maxlength="28" spellcheck="false" placeholder="#14b8a6" aria-label="Custom accent value"
+                    class="mt-2 w-28 text-xs font-mono rounded-control border border-zinc-200 dark:border-zinc-700 bg-[var(--color-input-bg)] text-zinc-700 dark:text-zinc-200 px-2 py-1 focus-ring" />
             </div>
 
-            {# Gray base — remaps the zinc scale the kit is built on. #}
+            {# Ink: the neutral theme colour; re-tones the kit's --color-ink-* scale. #}
             <div>
-                <div class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">Gray</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">Ink</div>
                 <div class="flex flex-wrap gap-1.5">
                     {% for c in gray_list %}
                     <c-ui.tooltip size="xs">
@@ -263,6 +281,7 @@ By default the working theme is saved to localStorage so it survives navigation 
             defaults: { accent: 'teal', gray: 'zinc', radius: '0.375rem', buttonRadius: 'default', radiusBox: '0.5rem', focusRing: '2px', inputShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)', borders: true, surfaceLight: 100, surfaceDark: 6 },
 
             accent: 'teal',
+            customAccent: '#14b8a6',  // used when accent === 'custom'; any CSS colour, normalised to hex
             gray: 'zinc',
             radius: '0.375rem',
             buttonRadius: 'default',  // 'default' inherits --radius-control; 'full' = pill
@@ -286,7 +305,7 @@ By default the working theme is saved to localStorage so it survives navigation 
             persist: opts.persist !== false,
             storageKey: opts.storageKey || 'cotton-ui:theme-builder',
             persistVersion: 1,
-            persistedKeys: ['accent', 'gray', 'radius', 'buttonRadius', 'radiusBox', 'focusRing', 'inputShadow', 'boxShadow', 'borders', 'surfaceLight', 'surfaceDark', 'panelOpen'],
+            persistedKeys: ['accent', 'customAccent', 'gray', 'radius', 'buttonRadius', 'radiusBox', 'focusRing', 'inputShadow', 'boxShadow', 'borders', 'surfaceLight', 'surfaceDark', 'panelOpen'],
 
             init() {
                 this.panelOpen = !!opts.open;
@@ -311,23 +330,20 @@ By default the working theme is saved to localStorage so it survives navigation 
             // persist is on) at the end so the theme carries across navigation.
             apply() {
                 const el = document.documentElement;
-                if (this.isDark) {
-                    el.style.setProperty('--color-accent', 'var(--color-' + this.accent + '-400)');
-                    el.style.setProperty('--color-accent-content', 'var(--color-' + this.accent + '-300)');
-                    el.style.setProperty('--color-accent-foreground', 'var(--color-' + this.accent + '-950)');
-                } else {
-                    el.style.setProperty('--color-accent', 'var(--color-' + this.accent + '-500)');
-                    el.style.setProperty('--color-accent-content', 'var(--color-' + this.accent + '-600)');
-                    el.style.setProperty('--color-accent-foreground', '#ffffff');
+                const a = this._accentValues(this.isDark);
+                if (a) {
+                    el.style.setProperty('--color-accent', a.accent);
+                    el.style.setProperty('--color-accent-content', a.content);
+                    el.style.setProperty('--color-accent-foreground', a.fg);
                 }
-                // Gray base: remap the zinc scale the kit is built on to the chosen gray, and drive
-                // --color-bg so the page (and the derived surface below) follows. For zinc we clear the
-                // overrides so the kit's own defaults stand. Runs before surface + card-border, which
-                // read --color-bg / --color-zinc-*.
-                this.shades.forEach((s) => el.style.removeProperty('--color-zinc-' + s));
+                // Gray base: re-tone the kit's own neutral (--color-ink-*) to the chosen gray, and
+                // drive --color-bg so the page (and the derived surface below) follows. 'zinc' is the
+                // default look, so we just clear the overrides and let --color-ink-* fall back to its
+                // zinc-valued default. A consumer's own zinc-* usage is never touched.
+                this.shades.forEach((s) => el.style.removeProperty('--color-ink-' + s));
                 if (this.gray !== 'zinc') {
                     const g = (n) => 'var(--color-' + this.gray + '-' + n + ')';
-                    this.shades.forEach((s) => el.style.setProperty('--color-zinc-' + s, g(s)));
+                    this.shades.forEach((s) => el.style.setProperty('--color-ink-' + s, g(s)));
                     el.style.setProperty('--color-bg', this.isDark ? g(900) : g(50));
                 } else {
                     el.style.removeProperty('--color-bg');
@@ -347,7 +363,7 @@ By default the working theme is saved to localStorage so it survives navigation 
                 el.style.setProperty('--shadow-box', this.boxShadow);
                 // Box-role border (cards): On → restore the gray (mode-aware) so it wins over a
                 // shadow-only default; Off → transparent. removeProperty can't beat the stylesheet.
-                el.style.setProperty('--color-card-border', this.borders ? (this.isDark ? 'var(--color-zinc-700)' : 'var(--color-zinc-200)') : 'transparent');
+                el.style.setProperty('--color-card-border', this.borders ? (this.isDark ? 'var(--color-ink-700)' : 'var(--color-ink-200)') : 'transparent');
 
                 this.save();
             },
@@ -372,8 +388,51 @@ By default the working theme is saved to localStorage so it survives navigation 
             },
 
             setAccent(a) { this.accent = a; this.apply(); },
+            setCustomAccent(v) {
+                const rgb = this._rgb(v);
+                if (!rgb) return;            // ignore an unparseable value, keep the previous
+                this.customAccent = this._hex(rgb);
+                this.accent = 'custom';
+                this.apply();
+            },
             setGray(g) { this.gray = g; this.apply(); },
             setBorders(v) { this.borders = v; this.apply(); },
+
+            // Accent → the three --color-accent* values for a mode. Named palettes reference the
+            // scale (export stays as var() refs); a custom colour derives concrete hex: content is a
+            // lighten/darken of the base, foreground flips black/white by luminance for contrast.
+            _accentValues(isDark) {
+                if (this.accent === 'custom') {
+                    const rgb = this._rgb(this.customAccent);
+                    if (!rgb) return null;
+                    if (isDark) {
+                        const a = this._mix(rgb, [255, 255, 255], 0.12);   // lift so it stays vivid on dark
+                        return { accent: this._hex(a), content: this._hex(this._mix(rgb, [255, 255, 255], 0.28)), fg: this._fg(a) };
+                    }
+                    return { accent: this._hex(rgb), content: this._hex(this._mix(rgb, [0, 0, 0], 0.14)), fg: this._fg(rgb) };
+                }
+                const v = (n) => 'var(--color-' + this.accent + '-' + n + ')';
+                return isDark ? { accent: v(400), content: v(300), fg: v(950) }
+                              : { accent: v(500), content: v(600), fg: '#ffffff' };
+            },
+            // Resolve any CSS colour (hex/rgb/hsl/oklch/named) to sRGB [r,g,b]. A canvas renders it
+            // to bytes, so out-of-sRGB inputs (e.g. oklch) get gamut-mapped, unlike getComputedStyle,
+            // which returns oklch() verbatim and would mis-parse as rgb.
+            _rgb(str) {
+                if (!str || !window.CSS || !CSS.supports('color', str)) return null;
+                const ctx = document.createElement('canvas').getContext('2d');
+                ctx.fillStyle = str;
+                ctx.fillRect(0, 0, 1, 1);
+                const d = ctx.getImageData(0, 0, 1, 1).data;
+                return [d[0], d[1], d[2]];
+            },
+            _hex(rgb) { return '#' + rgb.map((n) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0')).join(''); },
+            _mix(rgb, target, amt) { return rgb.map((c, i) => c + (target[i] - c) * amt); },
+            _fg(rgb) {
+                const lin = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+                const L = 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2]);
+                return L > 0.45 ? '#18181b' : '#ffffff';
+            },
 
             reset() { Object.assign(this, this.defaults); this.apply(); },
 
@@ -381,19 +440,23 @@ By default the working theme is saved to localStorage so it survives navigation 
             get isModified() { return Object.keys(this.defaults).some((k) => this[k] !== this.defaults[k]); },
 
             get css() {
-                // Gray base remaps Tailwind's zinc palette, which only a build can regenerate, so it
-                // goes in @theme (needs the consumer's own Tailwind build). Accent + component tokens
-                // use :root / .dark, which work on the no-build <link> path too.
-                const grayBlock = this.gray === 'zinc' ? '' :
-                    '\n\n@theme {\n' +
-                    '    /* Gray base: remap zinc to ' + this.gray + ' (the kit is built on the zinc scale; needs your own Tailwind build) */\n' +
-                    this.shades.map((s) => '    --color-zinc-' + s + ': var(--color-' + this.gray + '-' + s + ');').join('\n') +
-                    '\n}';
+                // Every token here works on the no-build <link> path: accent AND the gray base both
+                // override the kit's own :root variables (--color-accent*, --color-ink-*), so a custom
+                // Tailwind build is no longer required just to change the neutral.
+                const grayRoot = this.gray === 'zinc' ? '' :
+                    '\n    /* Ink: re-tone the neutral to ' + this.gray + ' (overrides the kit --color-ink-* tokens) */\n' +
+                    this.shades.map((s) => '    --color-ink-' + s + ': var(--color-' + this.gray + '-' + s + ');').join('\n') + '\n' +
+                    '    --color-bg: var(--color-' + this.gray + '-50);\n';
+                const grayDark = this.gray === 'zinc' ? '' :
+                    '    --color-bg: var(--color-' + this.gray + '-900);\n';
+                const al = this._accentValues(false), ad = this._accentValues(true);
                 return ':root {\n' +
                     '    /* Accent: primary buttons, links, focus ring, active states */\n' +
-                    '    --color-accent: var(--color-' + this.accent + '-500);\n' +
-                    '    --color-accent-content: var(--color-' + this.accent + '-600);\n' +
-                    '    --color-accent-foreground: var(--color-white);\n\n' +
+                    '    --color-accent: ' + al.accent + ';\n' +
+                    '    --color-accent-content: ' + al.content + ';\n' +
+                    '    --color-accent-foreground: ' + al.fg + ';\n' +
+                    grayRoot +
+                    '\n' +
                     '    /* Corner radius, by role */\n' +
                     '    --radius-control: ' + this.radius + ';\n' +
                     '    --radius-box: ' + this.radiusBox + ';\n' +
@@ -409,11 +472,12 @@ By default the working theme is saved to localStorage so it survives navigation 
                     '}\n\n' +
                     '.dark {\n' +
                     '    /* Dark mode: lighter accent so it stays vivid on dark surfaces */\n' +
-                    '    --color-accent: var(--color-' + this.accent + '-400);\n' +
-                    '    --color-accent-content: var(--color-' + this.accent + '-300);\n' +
-                    '    --color-accent-foreground: var(--color-' + this.accent + '-950);\n' +
+                    '    --color-accent: ' + ad.accent + ';\n' +
+                    '    --color-accent-content: ' + ad.content + ';\n' +
+                    '    --color-accent-foreground: ' + ad.fg + ';\n' +
+                    grayDark +
                     (this.surfaceDark !== 6 ? '    --surface-level: ' + this.surfaceDark + '%;\n' : '') +
-                    '}' + grayBlock;
+                    '}';
             },
 
             // Syntax-highlight reactively when highlight.js is present; x-html so the spans survive.

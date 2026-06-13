@@ -5,7 +5,7 @@
     subheading=""
     :variant_classes="{
         'raised': 'bg-[var(--color-surface)] shadow-[var(--shadow-box)] border border-[color:var(--color-card-border,var(--color-box-border))]',
-        'outline': 'border border-zinc-200 dark:border-zinc-700'
+        'outline': 'border border-ink-200 dark:border-ink-700'
     }"
     :padding_classes="{
         'none': '',
@@ -36,8 +36,8 @@ to the padded box.
     {{ class }}
 ">
     <div class="px-6 py-4 border-b border-[color:var(--color-box-border)]">
-        {% if title %}<h3 class="font-semibold text-zinc-900 dark:text-zinc-100">{{ title }}</h3>{% endif %}
-        {% if subheading %}<p class="text-sm text-zinc-500 dark:text-zinc-400{% if title %} mt-0.5{% endif %}">{{ subheading }}</p>{% endif %}
+        {% if title %}<h3 class="font-semibold text-ink-900 dark:text-ink-100">{{ title }}</h3>{% endif %}
+        {% if subheading %}<p class="text-sm text-ink-500 dark:text-ink-400{% if title %} mt-0.5{% endif %}">{{ subheading }}</p>{% endif %}
         {{ header }}
     </div>
     <div class="{{ padding_classes|get_item:padding }}">

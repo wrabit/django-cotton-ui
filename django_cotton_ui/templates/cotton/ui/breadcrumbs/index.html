@@ -17,7 +17,7 @@ CSS separator is switched off so the two never double up.
         const tpl = $refs.bcSeparator;
         $el.querySelectorAll('ol > li:not(:first-child)').forEach((li) => {
             const sep = document.createElement('span');
-            sep.className = 'mr-0.5 inline-flex items-center text-zinc-300 dark:text-zinc-600';
+            sep.className = 'mr-0.5 inline-flex items-center text-ink-300 dark:text-ink-600';
             sep.append(tpl.content.cloneNode(true));
             li.prepend(sep);
         });
@@ -26,7 +26,7 @@ CSS separator is switched off so the two never double up.
 >
   {% if separator %}<template x-ref="bcSeparator">{{ separator }}</template>{% endif %}
   <ol
-    class="flex items-center flex-wrap gap-1.5 text-sm text-zinc-500 dark:text-zinc-400 {{ class }}"
+    class="flex items-center flex-wrap gap-1.5 text-sm text-ink-500 dark:text-ink-400 {{ class }}"
     style="--bc-separator: {% if separator %}none{% else %}'/'{% endif %}"
   >{{ slot }}</ol>
 </nav>
