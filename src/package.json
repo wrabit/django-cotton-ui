@@ -1,6 +1,6 @@
 {
     "name": "cotton-ui",
-    "version": "0.2.8",
+    "version": "0.2.9",
     "description": "Cotton UI component library",
     "main": "dist/cotton-ui/cotton-ui.js",
     "author": "wrabit",
