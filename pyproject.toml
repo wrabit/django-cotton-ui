@@ -33,5 +33,5 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4"
-django = ">=4.2,<6.0"
+django = ">=4.2,<7.0"
 django-cotton = ">=2.5.0"
