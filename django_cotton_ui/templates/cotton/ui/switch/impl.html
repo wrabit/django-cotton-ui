@@ -1,5 +1,6 @@
 <c-vars
     name=""
+    class=""
     value="on"
     :disabled="False"
     :checked="False"
@@ -30,6 +31,7 @@
         name="{{ name }}"
         value="{{ value }}"
         {% if disabled %}disabled{% endif %}
+        {{ attrs }}
         class="sr-only"
         x-bind="input"
     />
@@ -39,10 +41,10 @@
         type="button"
         role="switch"
         x-bind="trigger"
-        {{ attrs }}
         class="relative inline-flex items-center rounded-full focus-ring
                {{ size_classes|get_item:size }}
-               {% if disabled %}opacity-50 cursor-not-allowed{% else %}cursor-pointer{% endif %}"
+               {% if disabled %}opacity-50 cursor-not-allowed{% else %}cursor-pointer{% endif %}
+               {{ class }}"
         :class="{
             'transition-colors': ready,
             {% if accent %}

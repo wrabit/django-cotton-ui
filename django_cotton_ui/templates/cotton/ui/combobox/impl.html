@@ -1,6 +1,7 @@
 {% load cotton_ui %}
 <c-vars
     name
+    class=""
     :options="[]"
     :selected="[]"
     placeholder=""
@@ -36,8 +37,7 @@
         initSelected('{{ selected|json_dumps_uri }}');
         initOptions('{{ options|json_dumps_uri }}');
      "
-     class="relative w-full group"
-     {{ attrs }}
+     class="relative w-full group {{ class }}"
 >
     <!-- Trigger / Container -->
     <div x-ref="trigger"
@@ -152,7 +152,7 @@
     </div>
 
     <!-- Hidden input for submission -->
-    <select x-ref="hiddenSelect" :name="name" multiple class="hidden">
+    <select x-ref="hiddenSelect" :name="name" multiple {{ attrs }} class="hidden">
         <template x-for="tag in tags" :key="tag">
             <option :value="tag" selected x-text="tag"></option>
         </template>

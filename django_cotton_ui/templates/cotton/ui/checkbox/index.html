@@ -4,6 +4,7 @@
     description=""
     icon=""
     name=""
+    class=""
     :disabled="False"
     :checked="False"
     :show_indicator="True"
@@ -19,7 +20,7 @@
     @click.prevent="{% if not disabled %}toggle('{{ value }}'){% endif %}"
     @keydown.enter.stop.prevent="{% if not disabled %}toggle('{{ value }}'){% endif %}"
     @keydown.space.stop.prevent="{% if not disabled %}toggle('{{ value }}'){% endif %}"
-    class="flex items-start gap-3 cursor-pointer focus-ring {% if disabled %}opacity-50 cursor-not-allowed{% endif %}"
+    class="flex items-start gap-3 cursor-pointer focus-ring {% if disabled %}opacity-50 cursor-not-allowed{% endif %} {{ class }}"
     x-bind:class="(() => {
         const variant = $el.closest('[data-variant]')?.dataset.variant || 'default';
         const classes = [];
@@ -61,6 +62,7 @@
         :checked="isChecked('{{ value }}')"
         {% if disabled %}disabled{% endif %}
         tabindex="-1"
+        {{ attrs }}
         class="sr-only"
     />
 
