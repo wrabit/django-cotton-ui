@@ -110,7 +110,7 @@
         --color-accent: var(--color-ink-100);
         --color-accent-content: var(--color-ink-300);
         --color-accent-foreground: var(--color-ink-900);
-        --color-bg: var(--color-ink-900);
+        --color-bg: var(--color-ink-950);  /* override to ink-900 for a softer dark, ink-800 for soft */
         --surface-level: 6%;  /* subtle lift off the dark page */
         --color-box-border: var(--color-ink-700);
         --color-muted: var(--color-ink-100);

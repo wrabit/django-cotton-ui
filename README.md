@@ -2,7 +2,7 @@
 
 An optional kit of accessible, themeable UI components for [Django Cotton](https://github.com/wrabit/django-cotton), built with Tailwind CSS v4 and Alpine.js.
 
-**Since we're < v1, it's possible some breaking changes could be make but best effort will be made for backwards compatibility**
+**‼️ Since we're < v1, it's possible some breaking changes could be make but best effort will be made for backwards compatibility**
 
 **[UI Docs](https://django-cotton.com/ui)**  | **[Installation](https://django-cotton.com/ui/installation)** |  **[Discord](https://discord.gg/gg5WE6NH)**
 
