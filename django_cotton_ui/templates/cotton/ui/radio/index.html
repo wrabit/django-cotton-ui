@@ -4,6 +4,7 @@
     description=""
     icon=""
     name=""
+    class=""
     :disabled="False"
     :show_indicator="True"
     :accent="True"
@@ -24,7 +25,7 @@
     @keydown.up.prevent="selectPrevious()"
     @keydown.right.prevent="selectNext()"
     @keydown.left.prevent="selectPrevious()"
-    class="flex items-start gap-3 cursor-pointer focus-ring {% if disabled %}opacity-50 cursor-not-allowed{% endif %}"
+    class="flex items-start gap-3 cursor-pointer focus-ring {% if disabled %}opacity-50 cursor-not-allowed{% endif %} {{ class }}"
     x-bind:class="itemClasses($el, '{{ value }}', {% if accent %}true{% else %}false{% endif %})"
 >
     {% comment %}Hidden native radio input for form submission{% endcomment %}
@@ -36,6 +37,7 @@
         {% if disabled %}disabled{% endif %}
         {% if checked %}checked{% endif %}
         tabindex="-1"
+        {{ attrs }}
         class="sr-only"
     />
 

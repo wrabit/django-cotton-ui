@@ -125,6 +125,28 @@ The kit is styled with Tailwind v4 and compiles from `@source`-scanned template 
   leaks into the HTML. Use `{% comment %}…{% endcomment %}` for multi-line notes.
 - Keep new components accessible (labels, roles, focus management) and matching the existing
   component API patterns (`c-vars` props, named slots, `{{ attrs }}` passthrough).
+- **Arbitrary attrs reach the value control.** So a Livewire-style framework binding
+  (`lace:model`, `wire:model`, `x-model`, `data-*`) set on a component tag reaches the element
+  that submits the value, put `{{ attrs }}` on the underlying `<input>`/`<select>`/`<textarea>`.
+  When the value lives in a hidden control behind a visible root (checkbox, radio, switch,
+  combobox), declare `class` in `<c-vars>` so `{{ class }}` styles the root and the class-free
+  `{{ attrs }}` binds the hidden control (a bare `{{ attrs }}` next to a hardcoded `class`
+  produces a duplicate `class` attribute and silently drops one). Covered by
+  `tests/integration/test_attribute_forwarding.py`.
+
+## Testing
+
+Tests live in `django_cotton_ui/tests/` and render the real component templates through the
+cotton loader (no fixtures). Run the whole suite from the repo root:
+
+```bash
+python runtests.py
+# or a single module / test:
+python runtests.py django_cotton_ui.tests.integration.test_attribute_forwarding
+```
+
+It uses Django's built-in runner with `django_cotton_ui/tests/settings.py`, so the only
+requirements are `django` and `django-cotton` (already dependencies) — no pytest needed.
 
 ## Releasing
 
