@@ -1,4 +1,5 @@
 <c-vars
+    name=""
     :autoresize="False"
     size="md"
     height="md"
@@ -37,6 +38,7 @@
         {{ size_classes|get_item:size }}
         {{ height_classes|get_item:height }}
     "
+    {% if name %}name="{{ name }}"{% endif %}
     {{ attrs }}
     {% if autoresize %}
         x-data="{ resize: () => { $el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px' } }"

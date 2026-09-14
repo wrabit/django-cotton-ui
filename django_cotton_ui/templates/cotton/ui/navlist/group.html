@@ -7,6 +7,7 @@
 {% if expandable %}
     <div x-data="{ expanded: {{ expanded|lower }} }" class="space-y-1">
         <button
+            type="button"
             @click="expanded = !expanded"
             class="w-full flex items-center justify-between px-3 py-2 font-semibold text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-300 transition-colors"
         >
