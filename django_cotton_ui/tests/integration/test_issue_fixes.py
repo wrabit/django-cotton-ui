@@ -34,3 +34,24 @@ class ButtonTypeTests(CottonUITestCase):
     def test_navlist_group_toggle_is_type_button(self):
         html = self.render('<c-ui.navlist.group heading="G" :expandable="True">x</c-ui.navlist.group>')
         self.assertIn('type="button"', opening_tag(html, r"<button\b[^>]*>"))
+
+
+class SwitchStateTests(CottonUITestCase):
+    """#26: the hidden checkbox must carry the switch's state. The runtime toggling
+    lives in switchInput.js; these cover the server-rendered half it depends on."""
+
+    CHECKBOX = r'<input type="checkbox"[^>]*>'
+
+    def test_checked_is_server_rendered(self):
+        html = self.render('<c-ui.switch name="sw" :checked="True" />')
+        self.assertRegex(opening_tag(html, self.CHECKBOX), r"\schecked\s")
+
+    def test_unchecked_by_default(self):
+        html = self.render('<c-ui.switch name="sw" />')
+        self.assertNotRegex(opening_tag(html, self.CHECKBOX), r"\schecked\s")
+
+    def test_checkbox_has_template_ref(self):
+        # switchInput.js reaches the checkbox via $refs.input; Alpine ignores an x-ref
+        # supplied through an x-bind object, so it must be on the element itself.
+        html = self.render('<c-ui.switch name="sw" />')
+        self.assertIn('x-ref="input"', opening_tag(html, self.CHECKBOX))

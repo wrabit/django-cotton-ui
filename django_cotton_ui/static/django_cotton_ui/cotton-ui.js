@@ -3416,6 +3416,7 @@
     ready: false,
     init() {
       this.$nextTick(() => {
+        this.switchOn = this.$refs.input.checked;
         this.ready = true;
       });
     },
@@ -3432,27 +3433,27 @@
         }
       },
       [":aria-label"]() {
-        if (this.$refs.input?.labels[0].innerText ?? false) {
+        if (this.$refs.input?.labels[0]?.innerText ?? false) {
           return this.$refs.input.labels[0].innerText;
         }
       }
     },
     input: {
-      ["x-model.boolean"]() {
-        return "switchOn";
-      },
-      ["x-ref"]() {
-        return "input";
-      },
       [":disabled"]() {
         return this.disabled;
+      },
+      ["@change"]() {
+        this.switchOn = this.$refs.input.checked;
       }
     },
     setSwitchState(value) {
-      if (this.disabled) {
+      if (this.disabled || value === this.switchOn) {
         return;
       }
       this.switchOn = value;
+      const input = this.$refs.input;
+      input.checked = value;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
       this.$dispatch("checkedChange");
     },
     toggle() {
